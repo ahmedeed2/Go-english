@@ -37,7 +37,7 @@
         /* Test Modal Specifics */
         #testModal { direction: ltr; text-align: left; }
         .test-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; }
+        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; } /* Hidden Timer Bar */
         .timer-progress { width: 100%; height: 100%; background: var(--primary-red); transition: width 1s linear; }
         .question-card h2 { font-size: 1.4rem; color: var(--primary-blue); margin-bottom: 25px; line-height: 1.4; }
         .test-options { display: grid; gap: 12px; }
@@ -429,6 +429,7 @@
 
         let currentQ = 0;
         let score = 0;
+        // Timer variables removed/disabled for test logic
 
         function startPlacementTest() {
             document.getElementById('testModal').style.display = 'block';
@@ -500,17 +501,7 @@
         }
 
         function closeTest() {
-            const testArea = document.getElementById('testArea');
-            if (testArea.style.display === 'block') {
-                const confirmExit = confirm("هل أنت متأكد من رغبتك في إنهاء الاختبار؟ سيتم فقدان تقدمك الحالي.");
-                if (confirmExit) {
-                    document.getElementById('testModal').style.display = 'none';
-                    resetTest();
-                }
-            } else {
-                document.getElementById('testModal').style.display = 'none';
-                resetTest();
-            }
+            document.getElementById('testModal').style.display = 'none';
         }
 
         const grammarContent = {
@@ -542,7 +533,7 @@
             document.getElementById('grammarTitle').innerText = data.title;
             document.getElementById('grammarBody').innerHTML = data.explanation;
             const quizItems = document.getElementById('quizItems');
-            quizItems.innerHTML = "";
+            quizItems.innerHTML = ""; // Clear existing quiz
             data.questions.forEach((item, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'quiz-question';
@@ -579,11 +570,104 @@
                 {en: "Do", ar: "يفعل", icon: "fa-gear", ex: "I do my homework.", exAr: "أفعل واجبي"},
                 {en: "Go", ar: "يذهب", icon: "fa-person-walking", ex: "I go to the park.", exAr: "أذهب إلى المنتزه"},
                 {en: "Want", ar: "يريد", icon: "fa-heart", ex: "I want a coffee.", exAr: "أريد قهوة"},
+                {en: "Like", ar: "يحب", icon: "fa-thumbs-up", ex: "I like pizza.", exAr: "أحب البيتزا"},
+                {en: "See", ar: "يرى", icon: "fa-eye", ex: "I see a bird.", exAr: "أرى عصفوراً"},
+                {en: "Eat", ar: "يأكل", icon: "fa-utensils", ex: "I eat an apple.", exAr: "آكل تفاحة"},
+                {en: "Drink", ar: "يشرب", icon: "fa-glass-water", ex: "I drink water.", exAr: "أشرب الماء"},
+                {en: "Sleep", ar: "ينام", icon: "fa-bed", ex: "I sleep early.", exAr: "أنام مبكراً"},
+                {en: "Work", ar: "يعمل", icon: "fa-briefcase", ex: "I work in an office.", exAr: "أعمل في مكتب"},
+                {en: "Study", ar: "يدرس", icon: "fa-graduation-cap", ex: "I study English.", exAr: "أدرس الإنجليزية"},
+                {en: "Help", ar: "يساعد", icon: "fa-handshake-angle", ex: "Can you help me?", exAr: "هل يمكنك مساعدتي؟"},
+                {en: "Know", ar: "يعرف", icon: "fa-lightbulb", ex: "I know his name.", exAr: "أعرف اسمه"},
+                {en: "Understand", ar: "يفهم", icon: "fa-brain", ex: "I understand the lesson.", exAr: "أفهم الدرس"},
+                {en: "Buy", ar: "يشتري", icon: "fa-cart-shopping", ex: "I buy milk every day.", exAr: "أشري حليباً كل يوم"},
+                {en: "Speak", ar: "يتحدث", icon: "fa-comments", ex: "I speak Arabic.", exAr: "أتحدث العربية"},
+                {en: "Write", ar: "يكتب", icon: "fa-pen-clip", ex: "Write your name here.", exAr: "اكتب اسمك هنا"},
+                {en: "Read", ar: "يقرأ", icon: "fa-book-open", ex: "I read a book.", exAr: "أقرأ كتاباً"},
+                {en: "Listen", ar: "يستمع", icon: "fa-ear-listen", ex: "Listen to the teacher.", exAr: "استمع للمعلم"},
+                {en: "Family", ar: "عائلة", icon: "fa-users", ex: "I love my family.", exAr: "أحب عائلتي"},
+                {en: "Friend", ar: "صديق", icon: "fa-user-group", ex: "Sarah is my friend.", exAr: "سارة صديقتي"},
+                {en: "Home", ar: "بيت", icon: "fa-house", ex: "I stay at home.", exAr: "أبقى في البيت"},
+                {en: "School", ar: "مدرسة", icon: "fa-school", ex: "The school is big.", exAr: "المدرسة كبيرة"},
+                {en: "Work", ar: "عمل", icon: "fa-building", ex: "I go to work by bus.", exAr: "أذهب للعمل بالحافلة"},
+                {en: "Time", ar: "وقت", icon: "fa-clock", ex: "What time is it?", exAr: "ما الوقت؟"},
+                {en: "Money", ar: "مال", icon: "fa-money-bill-wave", ex: "I don't have money.", exAr: "ليس معي مال"},
+                {en: "Food", ar: "طعام", icon: "fa-bowl-food", ex: "The food is delicious.", exAr: "الطعام لذيذ"},
+                {en: "Water", ar: "ماء", icon: "fa-droplet", ex: "Drink more water.", exAr: "اشرب ماءً أكثر"},
+                {en: "Book", ar: "كتاب", icon: "fa-book", ex: "This book is interesting.", exAr: "هذا الكتاب ممتع"},
+                {en: "City", ar: "مدينة", icon: "fa-city", ex: "Cairo is a big city.", exAr: "القاهرة مدينة كبيرة"},
+                {en: "Street", ar: "شارع", icon: "fa-road", ex: "The street is busy.", exAr: "الشارع مزدحم"},
+                {en: "Store", ar: "متجر", icon: "fa-shop", ex: "The store is closed.", exAr: "المتجر مغلق"},
+                {en: "Car", ar: "سيارة", icon: "fa-car", ex: "My car is white.", exAr: "سيارتي بيضاء"},
+                {en: "Phone", ar: "هاتف", icon: "fa-mobile-screen", ex: "Where is my phone?", exAr: "أين هاتفي؟"},
+                {en: "Day", ar: "يوم", icon: "fa-calendar-day", ex: "It is a sunny day.", exAr: "إنه يوم مشمس"},
+                {en: "Week", ar: "أسبوع", icon: "fa-calendar-week", ex: "See you next week.", exAr: "أراك الأسبوع القادم"},
+                {en: "Month", ar: "شهر", icon: "fa-calendar-days", ex: "This month is cold.", exAr: "هذا الشهر بارد"},
+                {en: "Year", ar: "سنة", icon: "fa-calendar", ex: "Happy New Year!", exAr: "سنة جديدة سعيدة"},
+                {en: "Life", ar: "حياة", icon: "fa-seedling", ex: "Life is beautiful.", exAr: "الحياة جميلة"},
+                {en: "Good", ar: "جيد", icon: "fa-face-smile", ex: "This is a good idea.", exAr: "هذه فكرة جيدة"},
+                {en: "Bad", ar: "سيء", icon: "fa-face-frown", ex: "The weather is bad.", exAr: "الطقس سيء"},
+                {en: "Big", ar: "كبير", icon: "fa-maximize", ex: "I have a big family.", exAr: "عندي عائلة كبيرة"},
+                {en: "Small", ar: "صغير", icon: "fa-minimize", ex: "My room is small.", exAr: "غرفتي صغيرة"},
+                {en: "Happy", ar: "سعيد", icon: "fa-face-laugh-beam", ex: "I am very happy.", exAr: "أنا سعيد جداً"},
+                {en: "Sad", ar: "حزين", icon: "fa-face-sad-tear", ex: "Don't be sad.", exAr: "لا تحزن"},
+                {en: "Hot", ar: "حار", icon: "fa-temperature-high", ex: "The tea is hot.", exAr: "الشاي ساخن"},
+                {en: "Cold", ar: "بارد", icon: "fa-temperature-low", ex: "I need a cold drink.", exAr: "أريد مشروباً بارداً"},
+                {en: "New", ar: "جديد", icon: "fa-sparkles", ex: "I have new shoes.", exAr: "عندي حذاء جديد"},
+                {en: "Old", ar: "قديم", icon: "fa-clock-rotate-left", ex: "This car is old.", exAr: "هذه السيارة قديمة"},
+                {en: "Easy", ar: "سهل", icon: "fa-check", ex: "English is easy.", exAr: "الإنجليزية سهلة"},
+                {en: "Hard", ar: "صعب", icon: "fa-lock", ex: "The exam was hard.", exAr: "الامتحان كان صعباً"},
+                {en: "Fast", ar: "سريع", icon: "fa-bolt", ex: "He is a fast runner.", exAr: "هو عداء سريع"},
+                {en: "Slow", ar: "بطيء", icon: "fa-snail", ex: "The internet is slow.", exAr: "الإنترنت بطيء"},
+                {en: "Beautiful", ar: "جميل", icon: "fa-wand-magic-sparkles", ex: "The flower is beautiful.", exAr: "الزهرة جميلة"},
+                {en: "Hungry", ar: "جائع", icon: "fa-cookie", ex: "I am hungry, let's eat.", exAr: "أنا جائع، لنأكل"},
+                {en: "Thirsty", ar: "عطشان", icon: "fa-faucet-drip", ex: "I am thirsty for juice.", exAr: "أنا عطشان للعصير"},
+                {en: "Tired", ar: "متعب", icon: "fa-battery-quarter", ex: "I feel tired today.", exAr: "أشعر بالتعب اليوم"},
+                {en: "Cheap", ar: "رخيص", icon: "fa-tag", ex: "This pen is cheap.", exAr: "هذا القلم رخيص"},
+                {en: "Expensive", ar: "غالي", icon: "fa-gem", ex: "Gold is expensive.", exAr: "الذهب غالي"},
+                {en: "Always", ar: "دائماً", icon: "fa-rotate", ex: "I always wake up early.", exAr: "أنا دائماً أستيقظ مبكراً"},
+                {en: "Never", ar: "أبداً", icon: "fa-circle-xmark", ex: "I never smoke.", exAr: "أنا لا أدخن أبداً"},
+                {en: "Sometimes", ar: "أحياناً", icon: "fa-hourglass-half", ex: "I sometimes walk to work.", exAr: "أحياناً أمشي للعمل"},
+                {en: "Today", ar: "اليوم", icon: "fa-sun", ex: "It is Monday today.", exAr: "اليوم هو الاثنين"},
+                {en: "Yesterday", ar: "أمس", icon: "fa-left-long", ex: "I was busy yesterday.", exAr: "كنت مشغولاً أمس"},
+                {en: "Tomorrow", ar: "غداً", icon: "fa-right-long", ex: "Call me tomorrow.", exAr: "اتصل بي غداً"},
+                {en: "Now", ar: "الآن", icon: "fa-stopwatch", ex: "I am studying now.", exAr: "أنا أدرس الآن"},
+                {en: "Later", ar: "لاحقاً", icon: "fa-clock-four", ex: "I will see you later.", exAr: "سأراك لاحقاً"},
+                {en: "Here", ar: "هنا", icon: "fa-location-dot", ex: "Sit here, please.", exAr: "اجلس هنا من فضلك"},
+                {en: "There", ar: "هناك", icon: "fa-location-arrow", ex: "The park is over there.", exAr: "المنتزه هناك"},
+                {en: "Because", ar: "لأن", icon: "fa-question-circle", ex: "I study because I want to learn.", exAr: "أدرس لأنني أريد أن أتعلم"},
+                {en: "But", ar: "لكن", icon: "fa-shuffle", ex: "I like tea, but I hate milk.", exAr: "أحب الشاي لكني أكره الحليب"},
+                {en: "And", ar: "و", icon: "fa-plus", ex: "I have a cat and a dog.", exAr: "عندي قط وكلب"},
+                {en: "Or", ar: "أو", icon: "fa-arrows-left-right", ex: "Do you want tea or coffee?", exAr: "هل تريد شاياً أم قهوة؟"},
+                {en: "With", ar: "مع", icon: "fa-link", ex: "I go with my brother.", exAr: "أذهب مع أخي"},
+                {en: "Without", ar: "بدون", icon: "fa-link-slash", ex: "I drink coffee without sugar.", exAr: "أشرب القهوة بدون سكر"},
+                {en: "Very", ar: "جداً", icon: "fa-up-long", ex: "It is very hot today.", exAr: "الجو حار جداً اليوم"},
+                {en: "Too", ar: "أيضاً", icon: "fa-angles-up", ex: "This shirt is too small.", exAr: "هذا القميص صغير جداً"},
+                {en: "Maybe", ar: "ربما", icon: "fa-circle-question", ex: "Maybe he is late.", exAr: "ربما هو متأخر"},
+                {en: "Really", ar: "حقاً", icon: "fa-exclamation", ex: "I really like this place.", exAr: "أنا حقاً أحب هذا المكان"},
+                {en: "Question", ar: "سؤال", icon: "fa-circle-question", ex: "I have a question.", exAr: "عندي سؤال"},
+                {en: "Answer", ar: "جواب", icon: "fa-message", ex: "I know the answer.", exAr: "أعرف الجواب"},
+                {en: "Name", ar: "اسم", icon: "fa-id-card", ex: "My name is Adam.", exAr: "اسمي آدم"},
+                {en: "Address", ar: "عنوان", icon: "fa-map-pin", ex: "What is your address?", exAr: "ما هو عنوانك؟"},
+                {en: "Number", ar: "رقم", icon: "fa-hashtag", ex: "Give me your phone number.", exAr: "أعطني رقم هاتفك"},
+                {en: "People", ar: "ناس", icon: "fa-people-group", ex: "There are many people here.", exAr: "يوجد الكثير من الناس هنا"},
+                {en: "Place", ar: "مكان", icon: "fa-location-dot", ex: "This is a nice place.", exAr: "هذا مكان لطيف"},
+                {en: "Thing", ar: "شيء", icon: "fa-box", ex: "What is that thing?", exAr: "ما هذا الشيء؟"},
+                {en: "Way", ar: "طريق", icon: "fa-route", ex: "Show me the way.", exAr: "أرني الطريق"},
+                {en: "Problem", ar: "مشكلة", icon: "fa-triangle-exclamation", ex: "No problem.", exAr: "لا مشكلة"},
+                {en: "Help", ar: "نجدة", icon: "fa-life-ring", ex: "I need some help.", exAr: "أحتاج بعض المساعدة"},
+                {en: "Morning", ar: "صباح", icon: "fa-mountain-sun", ex: "Good morning!", exAr: "صباح الخير"},
+                {en: "Night", ar: "ليل", icon: "fa-moon", ex: "I work at night.", exAr: "أعمل في الليل"},
+                {en: "Menu", ar: "قائمة طعام", icon: "fa-rectangle-list", ex: "Can I see the menu?", exAr: "هل يمكنني رؤية قائمة الطعام؟"},
+                {en: "Bill", ar: "فاتورة", icon: "fa-file-invoice-dollar", ex: "Can I have the bill, please?", exAr: "الحساب من فضلك"},
+                {en: "Key", ar: "مفتاح", icon: "fa-key", ex: "I lost my house key.", exAr: "فقدت مفتاح منزلي"},
+                {en: "Ticket", ar: "تذكرة", icon: "fa-ticket", ex: "I have a train ticket.", exAr: "معي تذكرة قطار"},
+                {en: "Bus", ar: "حافلة", icon: "fa-bus", ex: "The bus arrives at 10.", exAr: "الحافلة تصل الساعة 10"},
                 {en: "Airport", ar: "مطار", icon: "fa-plane-arrival", ex: "Take me to the airport.", exAr: "خذني إلى المطار"},
                 {en: "Map", ar: "خريطة", icon: "fa-map", ex: "Look at the map.", exAr: "انظر إلى الخريطة"}
             ],
-            b1: [{en: "Experience", ar: "خبرة", icon: "fa-star"}, {en: "Business", ar: "عمل", icon: "fa-briefcase"}],
-            c1: [{en: "Hypothesis", ar: "فرضية", icon: "fa-flask"}, {en: "Philosophy", ar: "فلسفة", icon: "fa-brain"}]
+            b1: [{en: "Experience", ar: "خبرة", icon: "fa-star"}, {en: "Business", ar: "عمل", icon: "fa-briefcase"}, {en: "Decision", ar: "قرار", icon: "fa-gavel"}, {en: "Environment", ar: "بيئة", icon: "fa-leaf"}],
+            c1: [{en: "Hypothesis", ar: "فرضية", icon: "fa-flask"}, {en: "Philosophy", ar: "فلسفة", icon: "fa-brain"}, {en: "Infrastructure", ar: "بنية تحتية", icon: "fa-bridge"}]
         };
 
         function openVocab(level) {
@@ -622,674 +706,9 @@
         }
 
         window.onclick = function(event) {
-            const testModal = document.getElementById('testModal');
-            const testArea = document.getElementById('testArea');
-
-            // تعديل النقر في شاشة الاختبار
-            if (event.target == testModal) {
-                // إذا كان الاختبار شغال (testArea ظاهر) نطلب تأكيد
-                if (testArea.style.display === 'block') {
-                    const confirmExit = confirm("هل أنت متأكد من رغبتك في إنهاء الاختبار؟ سيتم فقدان تقدمك الحالي.");
-                    if (confirmExit) {
-                        testModal.style.display = 'none';
-                        resetTest();
-                    }
-                } else {
-                    // في شاشة الترحيب أو النتيجة يغلق مباشرة
-                    testModal.style.display = 'none';
-                    resetTest();
-                }
-            }
             if (event.target == document.getElementById('vocabModal')) closeVocab();
             if (event.target == document.getElementById('grammarModal')) closeGrammar();
-        }
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Go English | احتراف اللغة الإنجليزية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-blue: #0e3b7d;
-            --primary-red: #da251d;
-            --bg-light: #fdfdfd;
-            --white: #ffffff;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg-light); color: #222; line-height: 1.6; }
-
-        /* Navigation */
-        nav { background: var(--white); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
-        .nav-logo img { height: 75px; width: auto; }
-        .contact-top-btn { background: var(--primary-blue); color: white; padding: 8px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
-
-        /* Hero Section */
-        header { background: linear-gradient(135deg, rgba(14, 59, 125, 0.95), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; padding: 80px 20px; color: white; text-align: center; }
-        .hero-banner { max-width: 600px; width: 90%; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 30px; }
-        .hero-content h1 { font-size: 3.2rem; margin-bottom: 10px; font-weight: 900; }
-        .hero-tagline { font-size: 1.8rem; color: #ffce00; margin-bottom: 20px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .hero-content p { font-size: 1.3rem; margin-bottom: 35px; max-width: 800px; margin-left: auto; margin-right: auto; opacity: 0.9; }
-
-        /* Placement Test Button Section */
-        .placement-cta { background: #fff; padding: 40px 20px; text-align: center; border-bottom: 2px solid #eee; }
-        .btn-test { background: var(--primary-blue); color: white; padding: 18px 35px; border-radius: 50px; text-decoration: none; font-size: 1.2rem; font-weight: 900; display: inline-flex; align-items: center; gap: 15px; transition: 0.3s; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(14, 59, 125, 0.2); }
-        .btn-test:hover { background: var(--primary-red); transform: scale(1.05); }
-
-        /* Test Modal Specifics */
-        #testModal { direction: ltr; text-align: left; }
-        .test-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; }
-        .timer-progress { width: 100%; height: 100%; background: var(--primary-red); transition: width 1s linear; }
-        .question-card h2 { font-size: 1.4rem; color: var(--primary-blue); margin-bottom: 25px; line-height: 1.4; }
-        .test-options { display: grid; gap: 12px; }
-        .test-option-btn { padding: 15px; border: 2px solid #eee; border-radius: 12px; background: white; cursor: pointer; font-size: 1.1rem; transition: 0.2s; text-align: left; }
-        .test-option-btn:hover { border-color: var(--primary-blue); background: #f0f7ff; }
-        .test-option-btn.selected { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
-        .test-footer { margin-top: 30px; display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid #eee; padding-top: 20px; }
-        .btn-next { background: #25d366; color: white; padding: 10px 30px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
-        .result-screen { text-align: center; padding: 40px 20px; direction: rtl; }
-        .result-score { font-size: 4rem; font-weight: 900; color: var(--primary-red); margin: 20px 0; }
-        .level-badge { font-size: 1.8rem; color: var(--primary-blue); font-weight: 700; margin-bottom: 10px; }
-
-        /* Features */
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; padding: 60px 5%; background: white; }
-        .feature-box { text-align: center; padding: 40px 20px; border-radius: 15px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.4s; border: 1px solid #f0f0f0; }
-        .feature-box:hover { transform: translateY(-10px); border-color: var(--primary-red); }
-        .feature-box i { font-size: 3rem; color: var(--primary-red); margin-bottom: 20px; }
-        .feature-box h3 { color: var(--primary-blue); margin-bottom: 15px; font-size: 1.5rem; }
-
-        /* Vocabulary Section */
-        .vocab-section { padding: 60px 5%; background-color: #f0f4f8; text-align: center; }
-        .vocab-levels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
-        .level-card { background: var(--white); padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; border: 2px solid transparent; text-align: center; }
-        .level-card:hover { border-color: var(--primary-blue); transform: scale(1.05); }
-        .level-card i { font-size: 2.5rem; color: var(--primary-red); margin-bottom: 15px; }
-
-        /* Grammar Hub Specific Styles */
-        .grammar-section { padding: 60px 5%; background: white; text-align: center; }
-        .grammar-card { position: relative; overflow: hidden; }
-        .coming-soon-badge { position: absolute; top: 10px; right: 10px; background: #777; color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; }
-        .grammar-explanation-content { text-align: right; direction: rtl; }
-        .grammar-explanation-content h3 { color: var(--primary-red); margin-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-        .grammar-explanation-content ul { list-style: none; padding-right: 15px; }
-        .grammar-explanation-content li::before { content: "•"; color: var(--primary-blue); font-weight: bold; display: inline-block; width: 1em; margin-right: -1em; }
-        .quiz-container { margin-top: 40px; background: #f9f9f9; padding: 20px; border-radius: 20px; text-align: left; direction: ltr; }
-        .quiz-question { margin-bottom: 25px; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .quiz-question p { font-weight: bold; color: var(--primary-blue); margin-bottom: 10px; font-size: 1.1rem; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .option-btn { padding: 10px; border: 2px solid #eee; border-radius: 8px; background: white; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; }
-        .option-btn:hover { border-color: var(--primary-blue); }
-        .option-btn.correct { background: #25d366 !important; color: white !important; border-color: #25d366 !important; }
-        .option-btn.wrong { background: var(--primary-red) !important; color: white !important; border-color: var(--primary-red) !important; }
-        .feedback { margin-top: 8px; font-size: 0.9rem; font-weight: bold; display: none; direction: rtl; text-align: right; }
-
-        /* Modal Styles */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); overflow-y: auto; }
-        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 30px; border-radius: 25px; width: 90%; max-width: 1000px; position: relative; }
-        .close-modal { position: absolute; left: 20px; top: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--primary-red); }
-        .words-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .word-item { background: #f9f9f9; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .word-item:hover { background: var(--primary-blue); color: white; }
-        .word-item i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
-        .example-txt { font-size: 0.8rem; margin-top: 5px; color: #666; font-style: italic; }
-        .word-item:hover .example-txt { color: #eee; }
-
-        /* Courses Section */
-        .container { max-width: 1200px; margin: 60px auto; padding: 0; }
-        .section-title { text-align: center; font-size: 2.8rem; margin-bottom: 15px; color: var(--primary-blue); font-weight: 900; }
-        .section-subtitle { text-align: center; color: #666; margin-bottom: 50px; font-size: 1.1rem; }
-        .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .course-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.07); transition: 0.3s; display: flex; flex-direction: column; }
-        .course-card:hover { transform: scale(1.02); }
-        .course-img { height: 220px; width: 100%; object-fit: cover; }
-        .course-content { padding: 25px; text-align: center; flex-grow: 1; }
-        .course-content h3 { color: var(--primary-blue); margin-bottom: 15px; font-size: 1.4rem; }
-        .course-content p { color: #555; margin-bottom: 25px; font-size: 0.95rem; }
-        .btn-whatsapp { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: #25d366; color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.3s; }
-        .btn-whatsapp:hover { background-color: #128c7e; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4); }
-
-        /* Footer */
-        .footer-info { background: #0a1931; color: white; padding: 60px 5% 30px; text-align: center; }
-        .footer-logo img { height: 100px; margin-bottom: 20px; filter: brightness(1.2); }
-        .contact-details { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; margin: 30px 0; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .contact-item { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
-        .contact-item i { color: var(--primary-red); }
-        .copyright { margin-top: 40px; font-size: 0.9rem; color: #888; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-
-        @media (max-width: 768px) { .hero-content h1 { font-size: 2.2rem; } .nav-logo img { height: 60px; } .hero-tagline { font-size: 1.4rem; } .options-grid { grid-template-columns: 1fr; } }
-    </style>
-</head>
-<body>
-
-    <nav>
-        <div class="nav-logo">
-            <img src="https://i.postimg.cc/7hxvdC7x/file-0000000095dc71f48b62b00798f8b2b2.png" alt="Go English Logo">
-        </div>
-        <a href="tel:01271032448" class="contact-top-btn">
-            <i class="fas fa-phone-alt"></i> اتصل بنا
-        </a>
-    </nav>
-
-    <header>
-        <div class="hero-content">
-            <img src='https://i.postimg.cc/Px4m1F7y/ahjz-alan-20260103-215647-0000.png' alt='أهلاً بك' class="hero-banner">
-            <h1>أهلاً بك في Go English</h1>
-            <div class="hero-tagline">مع مستر علاء خالد هتحترف الانجليزي</div>
-            <p>المكان الأفضل لتطوير مهاراتك في اللغة الإنجليزية بالبحيرة. نركز على النطق الصحيح، الاستماع، والمحادثة بأساليب تعليمية حديثة.</p>
-            <a href="#courses" class="btn-whatsapp" style="background: var(--primary-red); width: fit-content; margin: 0 auto; padding: 15px 40px;">ابدأ رحلتك الآن</a>
-        </div>
-    </header>
-
-    <section class="placement-cta">
-        <h2 style="color: var(--primary-blue); margin-bottom: 15px;">مش عارف مستواك؟</h2>
-        <p style="margin-bottom: 25px; color: #666;">ابدأ اختبار تحديد المستوى الآن (100 سؤال) واعرف نتيجتك فوراً!</p>
-        <button class="btn-test" onclick="startPlacementTest()">
-            <i class="fas fa-vial"></i> ابدأ اختبار تحديد المستوى
-        </button>
-    </section>
-
-    <div id="testModal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <span class="close-modal" onclick="closeTest()">&times; العودة للموقع</span>
-            
-            <div id="testWelcome" style="text-align: center; padding: 20px;">
-                <h2 style="color: var(--primary-blue); margin-bottom: 20px;">English Level Placement Test</h2>
-                <ul style="text-align: left; display: inline-block; margin-bottom: 30px; direction: ltr;">
-                    <li>• 100 Multiple choice questions.</li>
-                    <li>• No time limit - Answer at your own pace.</li>
-                    <li>• Final level based on your score.</li>
-                </ul>
-                <button class="btn-test" onclick="runTest()">Start Now</button>
-            </div>
-
-            <div id="testArea" style="display: none;">
-                <div class="timer-bar"><div id="timerProgress" class="timer-progress"></div></div>
-                <div class="test-container">
-                    <p id="questionCount" style="color: #888; margin-bottom: 10px; font-weight: bold;"></p>
-                    <div id="questionContainer" class="question-card">
-                        </div>
-                    <div class="test-footer">
-                        <button class="btn-next" onclick="nextQuestion()">Next Question</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="testResult" class="result-screen" style="display: none;">
-                <i class="fas fa-trophy" style="font-size: 4rem; color: #ffce00;"></i>
-                <h2>نتيجتك النهائية</h2>
-                <div class="result-score" id="finalScoreDisplay">0/100</div>
-                <div class="level-badge" id="levelName">--</div>
-                <p id="levelDesc" style="font-size: 1.1rem; color: #555; margin-bottom: 30px;"></p>
-                <button class="btn-test" onclick="closeTest()">العودة للرئيسية</button>
-            </div>
-        </div>
-    </div>
-
-    <section class="features">
-        <div class="feature-box">
-            <i class="fas fa-ear-listen"></i>
-            <h3>تطوير مهارات الاستماع</h3>
-            <p>نستخدم أحدث الوسائط الصوتية والمقاطع العالمية لتدريب أذنيك على فهم اللغة بجميع لهجاتها.</p>
-        </div>
-        <div class="feature-box">
-            <i class="fas fa-microphone-lines"></i>
-            <h3>المحادثة بطلاقة</h3>
-            <p>بيئة تفاعلية تكسر حاجز الخوف لديك وتجعلك تتحدث الإنجليزية بثقة من اليوم الأول.</p>
-        </div>
-        <div class="feature-box">
-            <i class="fas fa-users-gear"></i>
-            <h3>أساليب حديثة</h3>
-            <p>مناهجنا تبتعد عن التلقين الممل وتعتمد على الأنشطة والألعاب التعليمية والمواقف الحقيقية.</p>
-        </div>
-    </section>
-
-    <section class="grammar-section">
-        <h2 class="section-title">Grammar Hub</h2>
-        <p class="section-subtitle">اختر الزمن الذي تود إتقانه واستمتع بتجربة تعلم تفاعلية</p>
-        <div class="vocab-levels-grid">
-            <div class="level-card" onclick="openGrammar('pastSimple')">
-                <i class="fas fa-history"></i>
-                <h3>Past Simple</h3>
-                <p>زمن الماضي البسيط</p>
-            </div>
-            <div class="level-card grammar-card" style="opacity: 0.7; cursor: default;">
-                <span class="coming-soon-badge">قريباً</span>
-                <i class="fas fa-clock"></i>
-                <h3>Present Simple</h3>
-                <p>قريباً...</p>
-            </div>
-            <div class="level-card grammar-card" style="opacity: 0.7; cursor: default;">
-                <span class="coming-soon-badge">قريباً</span>
-                <i class="fas fa-hourglass-half"></i>
-                <h3>Future Tenses</h3>
-                <p>قريباً...</p>
-            </div>
-        </div>
-    </section>
-
-    <div id="grammarModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeGrammar()">&times; إغلاق</span>
-            <h2 id="grammarTitle" style="color: var(--primary-blue); margin-bottom: 10px; text-align: center;"></h2>
-            <div id="grammarBody" class="grammar-explanation-content">
-                </div>
-        </div>
-    </div>
-
-    <section class="vocab-section">
-        <h2 class="section-title">Vocabulary Hub</h2>
-        <p class="section-subtitle">اختر مستواك واستكشف أهم 100 كلمة لكل فئة</p>
-        <div class="vocab-levels-grid">
-            <div class="level-card" onclick="openVocab('a1')">
-                <i class="fas fa-seedling"></i>
-                <h3>Elementary (A1-A2)</h3>
-                <p>أساسيات الحياة اليومية</p>
-            </div>
-            <div class="level-card" onclick="openVocab('b1')">
-                <i class="fas fa-tree"></i>
-                <h3>Intermediate (B1-B2)</h3>
-                <p>كلمات العمل والمناقشات</p>
-            </div>
-            <div class="level-card" onclick="openVocab('c1')">
-                <i class="fas fa-mountain"></i>
-                <h3>Advanced (C1-C2)</h3>
-                <p>المصطلحات الأكاديمية والاحترافية</p>
-            </div>
-        </div>
-    </section>
-
-    <div id="vocabModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeVocab()">&times; إغلاق</span>
-            <h2 id="modalTitle" style="color: var(--primary-blue); margin-bottom: 10px;"></h2>
-            <p style="margin-bottom: 20px;">اضغط على الكلمة لسماع نطقها والجملة الخاصة بها</p>
-            <div id="wordsContainer" class="words-grid"></div>
-        </div>
-    </div>
-
-    <div class="container" id="courses">
-        <h2 class="section-title">الكورسات والمستويات</h2>
-        <p class="section-subtitle">نقدم لك رحلة متكاملة من الصفر (A1) حتى الاحتراف (B2)</p>
-        <div class="courses-grid">
-            <div class="course-card">
-                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=500&q=60" class="course-img">
-                <div class="course-content">
-                    <h3>المستوى A1 (1 & 2)</h3>
-                    <p>تأسيس كامل للمبتدئين: الحروف، النطق، وتكوين الجمل الأساسية للحياة اليومية.</p>
-                    <a href="https://wa.me/201271032448?text=أريد الاستفسار عن كورس المستوى المبتدئ A1" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> احجز عبر واتساب</a>
-                </div>
-            </div>
-            <div class="course-card">
-                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=500&q=60" class="course-img">
-                <div class="course-content">
-                    <h3>المستوى A2 (1 & 2)</h3>
-                    <p>المستوى فوق المبتدئ: تعلّم كيفية سرد القصص والتفاعل في مواقف العمل والسفر.</p>
-                    <a href="https://wa.me/201271032448?text=أريد الاستفسار عن كورس المستوى A2" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> احجز عبر واتساب</a>
-                </div>
-            </div>
-            <div class="course-card">
-                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=60" class="course-img">
-                <div class="course-content">
-                    <h3>المستوى B1 (1 & 2)</h3>
-                    <p>المستوى المتوسط: إتقان القواعد المعقدة والقدرة على إدارة حوارات طويلة بطلاقة.</p>
-                    <a href="https://wa.me/201271032448?text=أريد الاستفسار عن كورس المستوى المتوسط B1" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> احجز عبر واتساب</a>
-                </div>
-            </div>
-            <div class="course-card">
-                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=500&q=60" class="course-img">
-                <div class="course-content">
-                    <h3>المستوى B2 (1 & 2)</h3>
-                    <p>مرحلة الاحتراف: التحدث بعفوية وفهم النصوص التقنية والمقالات المعقدة.</p>
-                    <a href="https://wa.me/201271032448?text=أريد الاستفسار عن كورس المستوى المتقدم B2" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> احجز عبر واتساب</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <section class="footer-info">
-        <div class="footer-logo">
-            <img src="https://i.postimg.cc/7hxvdC7x/file-0000000095dc71f48b62b00798f8b2b2.png" alt="Go English">
-        </div>
-        <h2>تواصل معنا الآن</h2>
-        <div class="contact-details">
-            <div class="contact-item"><i class="fas fa-map-marker-alt"></i><span>البحيرة، مصر</span></div>
-            <div class="contact-item"><i class="fas fa-phone-alt"></i><span>01271032448</span></div>
-            <div class="contact-item"><i class="fab fa-whatsapp"></i><span>واتساب متاح 24/7</span></div>
-        </div>
-        <div class="copyright"><p>جميع الحقوق محفوظة لمركز Go English &copy; 2024</p></div>
-    </section>
-
-    <script>
-        const placementQuestions = [
-            // A1-A2 (30)
-            {q: "Hello, what ______ your name?", o: ["is", "are", "am"], c: 0},
-            {q: "I ______ from Egypt.", o: ["is", "am", "are"], c: 1},
-            {q: "This is my friend. ______ name is Sarah.", o: ["Her", "His", "She"], c: 0},
-            {q: "______ you a student?", o: ["Is", "Are", "Do"], c: 1},
-            {q: "I have two ______.", o: ["brother", "brothers", "brother's"], c: 1},
-            {q: "There ______ a pen on the table.", o: ["is", "are", "some"], c: 0},
-            {q: "I ______ like coffee.", o: ["no", "doesn't", "don't"], c: 2},
-            {q: "Where ______ she live?", o: ["do", "does", "is"], c: 1},
-            {q: "Yesterday, I ______ to the park.", o: ["go", "goes", "went"], c: 2},
-            {q: "She ______ TV every evening.", o: ["watch", "watches", "watching"], c: 1},
-            {q: "______ you see that movie last night?", o: ["Do", "Did", "Done"], c: 1},
-            {q: "I am ______ than my brother.", o: ["tall", "taller", "tallest"], c: 1},
-            {q: "This is the ______ book I have ever read.", o: ["good", "better", "best"], c: 2},
-            {q: "______ many people are in the room?", o: ["How", "Who", "What"], c: 0},
-            {q: "I ______ speak English very well yet.", o: ["can't", "am not", "don't"], c: 0},
-            {q: "Look! It ______ now.", o: ["rains", "is raining", "rain"], c: 1},
-            {q: "I usually go to work ______ bus.", o: ["by", "with", "in"], c: 0},
-            {q: "Whose bag is this? It's ______.", o: ["mine", "my", "me"], c: 0},
-            {q: "We ______ to London last summer.", o: ["fly", "flew", "flown"], c: 1},
-            {q: "I ______ breakfast at 7 AM today.", o: ["eat", "ate", "eaten"], c: 1},
-            {q: "There isn't ______ milk in the fridge.", o: ["some", "any", "a"], c: 1},
-            {q: "I want ______ apple, please.", o: ["a", "an", "the"], c: 1},
-            {q: "He ______ play football very well.", o: ["can", "cans", "is can"], c: 0},
-            {q: "What are you ______ tomorrow?", o: ["do", "did", "doing"], c: 2},
-            {q: "My birthday is ______ October.", o: ["in", "on", "at"], c: 0},
-            {q: "______ you like a cup of tea?", o: ["Will", "Would", "Do"], c: 1},
-            {q: "They ______ their homework right now.", o: ["are doing", "do", "does"], c: 0},
-            {q: "I ______ never been to France.", o: ["am", "have", "had"], c: 1},
-            {q: "We ______ a new car last week.", o: ["buy", "bought", "buys"], c: 1},
-            {q: "Excuse me, ______ is the supermarket?", o: ["where", "when", "who"], c: 0},
-            
-            // B1-B2 (40)
-            {q: "I ______ English for five years.", o: ["study", "am studying", "have been studying"], c: 2},
-            {q: "If it rains, we ______ at home.", o: ["stay", "will stay", "would stay"], c: 1},
-            {q: "She told me that she ______ the movie before.", o: ["saw", "has seen", "had seen"], c: 2},
-            {q: "The bridge ______ built in 1920.", o: ["was", "were", "is"], c: 0},
-            {q: "You ______ smoke here; it's forbidden.", o: ["don't have to", "mustnst", "needn't"], c: 1},
-            {q: "I ______ go to the gym, but now I don't.", o: ["used to", "use to", "am used to"], c: 0},
-            {q: "I'm looking forward to ______ you.", o: ["see", "seeing", "saw"], c: 1},
-            {q: "He asked me ______ I was busy.", o: ["that", "if", "what"], c: 1},
-            {q: "By the time he arrived, the meeting ______.", o: ["finished", "has finished", "had finished"], c: 2},
-            {q: "I ______ my hair cut yesterday.", o: ["had", "did", "got to"], c: 0},
-            {q: "This is the man ______ car was stolen.", o: ["who", "whose", "whom"], c: 1},
-            {q: "I wish I ______ more money.", o: ["have", "had", "would have"], c: 1},
-            {q: "You ______ have told me; I already knew.", o: ["shouldn't", "needn't", "couldn't"], c: 1},
-            {q: "Although it was cold, ______ he went out without a coat.", o: ["but", "(no word)", "however"], c: 1},
-            {q: "I ______ be able to help you tomorrow.", o: ["will", "can", "would"], c: 0},
-            {q: "She is ______ at playing the piano than her sister.", o: ["more better", "much better", "more good"], c: 1},
-            {q: "I'll call you as soon as I ______.", o: ["arrive", "will arrive", "arrived"], c: 0},
-            {q: "I suggest ______ to the cinema.", o: ["go", "going", "to go"], c: 1},
-            {q: "The room ______ every day.", o: ["cleans", "is cleaned", "is cleaning"], c: 1},
-            {q: "He is ______ young to drive a car.", o: ["too", "enough", "very"], c: 0},
-            {q: "I ______ my keys. Have you seen them?", o: ["lost", "have lost", "lose"], c: 1},
-            {q: "If I ______ you, I wouldn't do that.", o: ["am", "was", "were"], c: 2},
-            {q: "Despite ______ hard, he failed the exam.", o: ["studying", "he studied", "study"], c: 0},
-            {q: "I'd rather you ______ here.", o: ["don't smoke", "didn't smoke", "not smoke"], c: 1},
-            {q: "I ______ to finish this by 5 PM.", o: ["must", "have", "should"], c: 1},
-            {q: "The food was ______ delicious that I ate it all.", o: ["such", "so", "very"], c: 1},
-            {q: "Neither James ______ Mary was at the party.", o: ["or", "nor", "and"], c: 1},
-            {q: "I ______ working when you called.", o: ["am", "was", "have been"], c: 1},
-            {q: "I'm not used to ______ up so early.", o: ["get", "getting", "got"], c: 1},
-            {q: "You haven't seen my phone, ______?", o: ["have you", "haven't you", "do you"], c: 0},
-            {q: "I ______ better go now.", o: ["would", "had", "should"], c: 1},
-            {q: "The movie was so ______ that I fell asleep.", o: ["bored", "boring", "bore"], c: 1},
-            {q: "I’ve been living here ______ 2010.", o: ["for", "since", "in"], c: 1},
-            {q: "This car is ______ expensive for me.", o: ["too", "enough", "quite"], c: 0},
-            {q: "He succeeded ______ passing the test.", o: ["in", "at", "on"], c: 0},
-            {q: "I ______ my homework when the lights went out.", o: ["did", "was doing", "have done"], c: 1},
-            {q: "______ you like to go out for dinner?", o: ["Do", "Would", "Should"], c: 1},
-            {q: "I don't know ______ she is.", o: ["who", "which", "what"], c: 0},
-            {q: "She ______ her promise.", o: ["kept", "held", "took"], c: 0},
-            {q: "I'll wait here until she ______.", o: ["comes", "will come", "come"], c: 0},
-            
-            // C1 (30)
-            {q: "Rarely ______ such a beautiful sunset.", o: ["I have seen", "have I seen", "saw I"], c: 1},
-            {q: "It’s high time you ______ a job.", o: ["find", "found", "to find"], c: 1},
-            {q: "No sooner ______ left the house than it started to rain.", o: ["he had", "had he", "did he"], c: 1},
-            {q: "I’d rather ______ home tonight.", o: ["stay", "stayed", "to stay"], c: 0},
-            {q: "Supposing you ______ the lottery, what would you do?", o: ["win", "won", "had won"], c: 1},
-            {q: "He acted as if he ______ the boss.", o: ["is", "were", "has been"], c: 1},
-            {q: "______ for your help, I wouldn't have succeeded.", o: ["If it wasn't", "Had it not been", "But for"], c: 1},
-            {q: "The company is on the ______ of bankruptcy.", o: ["edge", "verge", "border"], c: 1},
-            {q: "I'm ______ to believe that he is telling the truth.", o: ["inclined", "intended", "supposed"], c: 0},
-            {q: "It’s a ______ conclusion that they will win.", o: ["foregone", "finished", "final"], c: 0},
-            {q: "He ______ into the room as if nothing had happened.", o: ["strolled", "walked", "went"], c: 0},
-            {q: "I can't ______ the thought of losing him.", o: ["bear", "stand", "carry"], c: 0},
-            {q: "The project was ______ by technical problems.", o: ["hampered", "stopped", "prevented"], c: 0},
-            {q: "She has a ______ for languages.", o: ["gift", "talent", "knack"], c: 2},
-            {q: "The news was a bitter ______ to swallow.", o: ["pill", "cake", "food"], c: 0},
-            {q: "He is a ______ in the side of the government.", o: ["thorn", "stone", "stick"], c: 0},
-            {q: "The plan was ______ from the start.", o: ["flawed", "broken", "bad"], c: 0},
-            {q: "I was ______ by his generosity.", o: ["overwhelmed", "overtaken", "overdone"], c: 0},
-            {q: "He is always ______ about his achievements.", o: ["boasting", "talking", "saying"], c: 0},
-            {q: "The situation is ______ with danger.", o: ["fraught", "filled", "full"], c: 0},
-            {q: "Under no circumstances ______ you leave the building.", o: ["you should", "should you", "you must"], c: 1},
-            {q: "Little ______ did I know that he was lying.", o: ["(no word)", "do", "had"], c: 0},
-            {q: "Should you ______ any help, let me know.", o: ["need", "needing", "needed"], c: 0},
-            {q: "It is essential that he ______ on time.", o: ["is", "be", "was"], c: 1},
-            {q: "I was on the ______ of leaving when she called.", o: ["point", "edge", "limit"], c: 0},
-            {q: "The costs ______ the benefits.", o: ["outweigh", "outdo", "outrun"], c: 0},
-            {q: "He has an ______ memory.", o: ["impeccable", "perfect", "easy"], c: 0},
-            {q: "I was ______ to hear the news.", o: ["startled", "surprised", "shocked"], c: 0},
-            {q: "The evidence is ______.", o: ["conclusive", "final", "finished"], c: 0},
-            {q: "He is at a ______ end.", o: ["loose", "free", "lost"], c: 0}
-        ];
-
-        let currentQ = 0;
-        let score = 0;
-
-        function startPlacementTest() {
-            document.getElementById('testModal').style.display = 'block';
-            resetTest();
-        }
-
-        function resetTest() {
-            currentQ = 0; score = 0;
-            document.getElementById('testWelcome').style.display = 'block';
-            document.getElementById('testArea').style.display = 'none';
-            document.getElementById('testResult').style.display = 'none';
-        }
-
-        function runTest() {
-            document.getElementById('testWelcome').style.display = 'none';
-            document.getElementById('testArea').style.display = 'block';
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const qData = placementQuestions[currentQ];
-            document.getElementById('questionCount').innerText = `Question ${currentQ + 1} of 100`;
-            
-            let html = `<h2>${qData.q}</h2><div class="test-options">`;
-            qData.o.forEach((opt, idx) => {
-                html += `<button class="test-option-btn" onclick="selectOption(this, ${idx})">${opt}</button>`;
-            });
-            html += `</div>`;
-            
-            document.getElementById('questionContainer').innerHTML = html;
-        }
-
-        function selectOption(btn, idx) {
-            const btns = document.querySelectorAll('.test-option-btn');
-            btns.forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            btn.dataset.chosen = idx;
-        }
-
-        function nextQuestion() {
-            const selected = document.querySelector('.test-option-btn.selected');
-            if(selected && parseInt(selected.dataset.chosen) === placementQuestions[currentQ].c) {
-                score++;
-            }
-
-            currentQ++;
-            if(currentQ < placementQuestions.length) {
-                showQuestion();
-            } else {
-                finishTest();
-            }
-        }
-
-        function finishTest() {
-            document.getElementById('testArea').style.display = 'none';
-            document.getElementById('testResult').style.display = 'block';
-            document.getElementById('finalScoreDisplay').innerText = `${score}/100`;
-            
-            let level = ""; let desc = "";
-            if(score <= 25) { level = "A1 (Beginner)"; desc = "أنت في بداية الطريق، تحتاج للتأسيس في القواعد والكلمات الأساسية."; }
-            else if(score <= 45) { level = "A2 (Elementary)"; desc = "مستواك مبتدئ، تستطيع فهم الجمل البسيطة ولكن تحتاج لتطوير مهارات المحادثة."; }
-            else if(score <= 65) { level = "B1 (Intermediate)"; desc = "مستوى متوسط، يمكنك إدارة حوارات يومية جيدة، تحتاج للعمل على القواعد الأكثر تعقيداً."; }
-            else if(score <= 80) { level = "B2 (Upper Intermediate)"; desc = "مستوى فوق المتوسط، تتحدث بطلاقة جيدة جداً، ينقصك بعض اللمسات الاحترافية."; }
-            else if(score <= 92) { level = "C1 (Advanced)"; desc = "مستوى متقدم، أنت محترف في اللغة وتستطيع فهم النصوص الأكاديمية الصعبة."; }
-            else { level = "C2 (Proficiency)"; desc = "مستوى خبير، لغتك تضاهي المتحدثين الأصليين!"; }
-            
-            document.getElementById('levelName').innerText = level;
-            document.getElementById('levelDesc').innerText = desc;
-        }
-
-        function closeTest() {
-            const testArea = document.getElementById('testArea');
-            if (testArea.style.display === 'block') {
-                const confirmExit = confirm("هل أنت متأكد من رغبتك في إنهاء الاختبار؟ سيتم فقدان تقدمك الحالي.");
-                if (confirmExit) {
-                    document.getElementById('testModal').style.display = 'none';
-                    resetTest();
-                }
-            } else {
-                document.getElementById('testModal').style.display = 'none';
-                resetTest();
-            }
-        }
-
-        const grammarContent = {
-            pastSimple: {
-                title: "Past Simple (الماضي البسيط)",
-                explanation: `<p>نستخدمه لنتحدث عن أحداث بدأت وانتهت في وقت محدد في الماضي.</p><h3>1. متى نستخدمه؟ (Usage)</h3><ul><li><strong>حدث انتهى تماماً:</strong> (I watched a movie yesterday).</li><li><strong>قصة أو سلسلة أحداث متتالية:</strong> (I woke up, had breakfast, and went to work).</li><li><strong>عادة قديمة انتهت:</strong> (I played football when I was a child).</li></ul><h3>2. كيف نصيغ الفعل؟ (Form)</h3><p>أ- الأفعال المنتظمة (Regular Verbs): نضيف (ed) لنهايتها.</p><ul><li>Play → Played</li><li>Watch → Watched</li><li>إذا انتهى الفعل بـ e، نضيف d فقط: Like → Liked</li><li>إذا انتهى بـ y وقبله حرف ساكن، نحذف y ونضيف ied: Study → Studied</li></ul><p>ب- الأفعال غير المنتظمة (Irregular Verbs): يتغير شكلها بالكامل ويجب حفظها.</p><ul><li>Go → Went</li><li>Eat → Ate</li><li>Have → Had</li><li>Drink → Drank</li></ul><h3>3. النفي (Negative)</h3><p>نستخدم البطل المساعد <strong>didn't</strong>. القاعدة الذهبية: بعد didn't، يعود الفعل لأصله (المصدر).</p><ul><li>الإثبات: I played tennis. | النفي: I didn't play tennis.</li><li>الإثبات: He went home. | النفي: He didn't go home.</li></ul><h3>4. السؤال (Question)</h3><p>نبدأ السؤال بكلمة <strong>Did</strong>، وأيضاً يعود الفعل لأصله.</p><ul><li>Did you eat lunch? (هل أكلت الغداء؟)</li><li>Did they watch the match? (هل شاهدوا المباراة؟)</li></ul><h3>5. الكلمات الدالة (Keywords)</h3><ul><li>Yesterday (أمس)</li><li>Last... (الماضي) ← Last week, Last year.</li><li>...Ago (منذ) ← Two days ago (منذ يومين).</li><li>In 2020 (في تاريخ قديم).</li></ul><h3>6. حالة خاصة: فعل "يكون" (Was / Were)</h3><p>هذا الفعل لا يحتاج لـ did في النفي أو السؤال، هو يخدم نفسه بنفسه.</p><div class="quiz-container" id="pastSimpleQuiz"><h2 style="text-align:center; color: var(--primary-red); margin-bottom:20px;">اختبر نفسك (Quiz)</h2><div id="quizItems"></div></div>`,
-                questions: [
-                    { q: "Yesterday, I ________ a very interesting book.", options: ["readed", "reads", "read", "reading"], correct: 2, feed: "c) read (لأن الماضي من read يُكتب كما هو ولكن يُنطق 'ريد' مثل لون الأحمر)." },
-                    { q: "They ________ to the mall last weekend.", options: ["go", "went", "gone", "goed"], correct: 1, feed: "b) went (لأن went هو الماضي غير المنتظم من go)." },
-                    { q: "She ________ her homework an hour ago.", options: ["finish", "finishes", "finishing", "finished"], correct: 3, feed: "d) finished (فعل منتظم أضفنا له ed)." },
-                    { q: "We ________ happy with the results yesterday.", options: ["was", "were", "are", "did"], correct: 1, feed: "b) were (لأن We جمع وتأخذ were في الماضي)." },
-                    { q: "He ________ see the movie last night.", options: ["doesn't", "didn't", "wasn't", "don't"], correct: 1, feed: "b) didn't (نستخدم didn't لنفي الأفعال في الماضي)." },
-                    { q: "________ you call me this morning?", options: ["Do", "Was", "Did", "Were"], correct: 2, feed: "c) Did (نبدأ السؤال عن الماضي بـ Did)." },
-                    { q: "I ________ my keys in the car.", options: ["lose", "lost", "losed", "losing"], correct: 1, feed: "b) lost (الماضي من lose وهو فعل غير منتظم)." },
-                    { q: "They ________ at the party two days ago.", options: ["weren't", "wasn't", "didn't", "not were"], correct: 0, feed: "a) weren't (نفي فعل 'يكون' للجمع في الماضي)." },
-                    { q: "Did you ________ the email?", options: ["sent", "sends", "sending", "send"], correct: 3, feed: "d) send (بعد Did يرجع الفعل لأصله 'المصدر' بدون إضافات)." },
-                    { q: "My parents ________ a new car last month.", options: ["buy", "bought", "buyed", "buying"], correct: 1, feed: "b) bought (الماضي من buy وهو فعل غير منتظم)." },
-                    { q: "Where ________ she go for her vacation?", options: ["did", "does", "was", "were"], correct: 0, feed: "a) did (أداة السؤال عن الماضي)." },
-                    { q: "I ________ very tired after the long trip.", options: ["were", "am", "was", "did"], correct: 2, feed: "c) was (لأن I تأخذ was في الماضي)." },
-                    { q: "We ________ football in the park yesterday.", options: ["play", "played", "playing", "plays"], correct: 1, feed: "b) played (فعل منتظم أضفنا له ed)." },
-                    { q: "She ________ drink her juice this morning.", options: ["didn't", "wasn't", "don't", "not"], correct: 0, feed: "a) didn't (للنفي، وبعدها الفعل drink في المصدر)." },
-                    { q: "Last year, I ________ to France for the first time.", options: ["travel", "travels", "travelled", "traveling"], correct: 2, feed: "c) travelled (فعل منتظم أضفنا له ed)." }
-                ]
-            }
-        };
-
-        function openGrammar(key) {
-            const data = grammarContent[key];
-            document.getElementById('grammarTitle').innerText = data.title;
-            document.getElementById('grammarBody').innerHTML = data.explanation;
-            const quizItems = document.getElementById('quizItems');
-            quizItems.innerHTML = "";
-            data.questions.forEach((item, index) => {
-                const qDiv = document.createElement('div');
-                qDiv.className = 'quiz-question';
-                qDiv.innerHTML = `<p>${index + 1}. ${item.q}</p><div class="options-grid">${item.options.map((opt, i) => `<button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${key}')">${opt}</button>`).join('')}</div><div class="feedback" id="feed-${index}"></div>`;
-                quizItems.appendChild(qDiv);
-            });
-            document.getElementById('grammarModal').style.display = 'block';
-        }
-
-        function checkAnswer(btn, qIdx, oIdx, key) {
-            const question = grammarContent[key].questions[qIdx];
-            const feedback = document.getElementById(`feed-${qIdx}`);
-            const buttons = btn.parentElement.querySelectorAll('.option-btn');
-            buttons.forEach(b => b.disabled = true);
-            if (oIdx === question.correct) {
-                btn.classList.add('correct');
-                feedback.innerHTML = "إجابة صحيحة! " + question.feed;
-                feedback.style.color = "#25d366";
-            } else {
-                btn.classList.add('wrong');
-                buttons[question.correct].classList.add('correct');
-                feedback.innerHTML = "إجابة خاطئة. " + question.feed;
-                feedback.style.color = "var(--primary-red)";
-            }
-            feedback.style.display = "block";
-        }
-
-        function closeGrammar() { document.getElementById('grammarModal').style.display = 'none'; }
-
-        const vocabData = {
-            a1: [
-                {en: "Be", ar: "يكون", icon: "fa-circle-check", ex: "I am a student.", exAr: "أنا طالب"},
-                {en: "Have", ar: "يملك", icon: "fa-hand-holding", ex: "I have a blue pen.", exAr: "لدي قلم أزرق"},
-                {en: "Do", ar: "يفعل", icon: "fa-gear", ex: "I do my homework.", exAr: "أفعل واجبي"},
-                {en: "Go", ar: "يذهب", icon: "fa-person-walking", ex: "I go to the park.", exAr: "أذهب إلى المنتزه"},
-                {en: "Want", ar: "يريد", icon: "fa-heart", ex: "I want a coffee.", exAr: "أريد قهوة"},
-                {en: "Airport", ar: "مطار", icon: "fa-plane-arrival", ex: "Take me to the airport.", exAr: "خذني إلى المطار"},
-                {en: "Map", ar: "خريطة", icon: "fa-map", ex: "Look at the map.", exAr: "انظر إلى الخريطة"}
-            ],
-            b1: [{en: "Experience", ar: "خبرة", icon: "fa-star"}, {en: "Business", ar: "عمل", icon: "fa-briefcase"}],
-            c1: [{en: "Hypothesis", ar: "فرضية", icon: "fa-flask"}, {en: "Philosophy", ar: "فلسفة", icon: "fa-brain"}]
-        };
-
-        function openVocab(level) {
-            const container = document.getElementById('wordsContainer');
-            const title = document.getElementById('modalTitle');
-            container.innerHTML = '';
-            title.innerText = level.toUpperCase() + " Vocabulary List";
-            vocabData[level].forEach(word => {
-                const div = document.createElement('div');
-                div.className = 'word-item';
-                div.onclick = () => speak(word.en, word.ex);
-                let content = `<i class="fas ${word.icon}"></i><strong>${word.en}</strong><small>${word.ar}</small>`;
-                if(word.ex) content += `<span class="example-txt">${word.ex}</span><span class="example-txt">(${word.exAr})</span>`;
-                div.innerHTML = content;
-                container.appendChild(div);
-            });
-            document.getElementById('vocabModal').style.display = 'block';
-        }
-
-        function closeVocab() { document.getElementById('vocabModal').style.display = 'none'; }
-
-        function speak(word, sentence) {
-            window.speechSynthesis.cancel(); 
-            const msgWord = new SpeechSynthesisUtterance(word);
-            msgWord.lang = 'en-US';
-            msgWord.rate = 0.9;
-            msgWord.onend = () => {
-                if(sentence) {
-                    const msgSentence = new SpeechSynthesisUtterance(sentence);
-                    msgSentence.lang = 'en-US';
-                    msgSentence.rate = 0.8;
-                    window.speechSynthesis.speak(msgSentence);
-                }
-            };
-            window.speechSynthesis.speak(msgWord);
-        }
-
-        window.onclick = function(event) {
-            const testModal = document.getElementById('testModal');
-            const testArea = document.getElementById('testArea');
-
-            // تعديل النقر في شاشة الاختبار
-            if (event.target == testModal) {
-                // إذا كان الاختبار شغال (testArea ظاهر) نطلب تأكيد
-                if (testArea.style.display === 'block') {
-                    const confirmExit = confirm("هل أنت متأكد من رغبتك في إنهاء الاختبار؟ سيتم فقدان تقدمك الحالي.");
-                    if (confirmExit) {
-                        testModal.style.display = 'none';
-                        resetTest();
-                    }
-                } else {
-                    // في شاشة الترحيب أو النتيجة يغلق مباشرة
-                    testModal.style.display = 'none';
-                    resetTest();
-                }
-            }
-            if (event.target == document.getElementById('vocabModal')) closeVocab();
-            if (event.target == document.getElementById('grammarModal')) closeGrammar();
+            if (event.target == document.getElementById('testModal')) closeTest();
         }
     </script>
 </body>
