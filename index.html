@@ -29,6 +29,27 @@
         .hero-tagline { font-size: 1.8rem; color: #ffce00; margin-bottom: 20px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
         .hero-content p { font-size: 1.3rem; margin-bottom: 35px; max-width: 800px; margin-left: auto; margin-right: auto; opacity: 0.9; }
 
+        /* Placement Test Button Section */
+        .placement-cta { background: #fff; padding: 40px 20px; text-align: center; border-bottom: 2px solid #eee; }
+        .btn-test { background: var(--primary-blue); color: white; padding: 18px 35px; border-radius: 50px; text-decoration: none; font-size: 1.2rem; font-weight: 900; display: inline-flex; align-items: center; gap: 15px; transition: 0.3s; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(14, 59, 125, 0.2); }
+        .btn-test:hover { background: var(--primary-red); transform: scale(1.05); }
+
+        /* Test Modal Specifics */
+        #testModal { direction: ltr; text-align: left; }
+        .test-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        .timer-progress { width: 100%; height: 100%; background: var(--primary-red); transition: width 1s linear; }
+        .question-card h2 { font-size: 1.4rem; color: var(--primary-blue); margin-bottom: 25px; line-height: 1.4; }
+        .test-options { display: grid; gap: 12px; }
+        .test-option-btn { padding: 15px; border: 2px solid #eee; border-radius: 12px; background: white; cursor: pointer; font-size: 1.1rem; transition: 0.2s; text-align: left; }
+        .test-option-btn:hover { border-color: var(--primary-blue); background: #f0f7ff; }
+        .test-option-btn.selected { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+        .test-footer { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 20px; }
+        .btn-next { background: #25d366; color: white; padding: 10px 30px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+        .result-screen { text-align: center; padding: 40px 20px; direction: rtl; }
+        .result-score { font-size: 4rem; font-weight: 900; color: var(--primary-red); margin: 20px 0; }
+        .level-badge { font-size: 1.8rem; color: var(--primary-blue); font-weight: 700; margin-bottom: 10px; }
+
         /* Features */
         .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; padding: 60px 5%; background: white; }
         .feature-box { text-align: center; padding: 40px 20px; border-radius: 15px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.4s; border: 1px solid #f0f0f0; }
@@ -117,6 +138,53 @@
             <a href="#courses" class="btn-whatsapp" style="background: var(--primary-red); width: fit-content; margin: 0 auto; padding: 15px 40px;">ابدأ رحلتك الآن</a>
         </div>
     </header>
+
+    <section class="placement-cta">
+        <h2 style="color: var(--primary-blue); margin-bottom: 15px;">مش عارف مستواك؟</h2>
+        <p style="margin-bottom: 25px; color: #666;">ابدأ اختبار تحديد المستوى الآن (100 سؤال) واعرف نتيجتك فوراً!</p>
+        <button class="btn-test" onclick="startPlacementTest()">
+            <i class="fas fa-vial"></i> ابدأ اختبار تحديد المستوى
+        </button>
+    </section>
+
+    <div id="testModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close-modal" onclick="closeTest()">&times; العودة للموقع</span>
+            
+            <div id="testWelcome" style="text-align: center; padding: 20px;">
+                <h2 style="color: var(--primary-blue); margin-bottom: 20px;">English Level Placement Test</h2>
+                <ul style="text-align: left; display: inline-block; margin-bottom: 30px; direction: ltr;">
+                    <li>• 100 Multiple choice questions.</li>
+                    <li>• 20 Seconds per question.</li>
+                    <li>• Auto-advance when time runs out.</li>
+                    <li>• Final level based on your score.</li>
+                </ul>
+                <button class="btn-test" onclick="runTest()">Start Now</button>
+            </div>
+
+            <div id="testArea" style="display: none;">
+                <div class="timer-bar"><div id="timerProgress" class="timer-progress"></div></div>
+                <div class="test-container">
+                    <p id="questionCount" style="color: #888; margin-bottom: 10px; font-weight: bold;"></p>
+                    <div id="questionContainer" class="question-card">
+                        </div>
+                    <div class="test-footer">
+                        <span id="timerText" style="font-weight: bold; color: var(--primary-red);">Time: 20s</span>
+                        <button class="btn-next" onclick="nextQuestion()">Next Question</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="testResult" class="result-screen" style="display: none;">
+                <i class="fas fa-trophy" style="font-size: 4rem; color: #ffce00;"></i>
+                <h2>نتيجتك النهائية</h2>
+                <div class="result-score" id="finalScoreDisplay">0/100</div>
+                <div class="level-badge" id="levelName">--</div>
+                <p id="levelDesc" style="font-size: 1.1rem; color: #555; margin-bottom: 30px;"></p>
+                <button class="btn-test" onclick="closeTest()">العودة للرئيسية</button>
+            </div>
+        </div>
+    </div>
 
     <section class="features">
         <div class="feature-box">
@@ -253,59 +321,213 @@
     </section>
 
     <script>
-        // Grammar Data and Logic
+        const placementQuestions = [
+            // A1-A2 (30)
+            {q: "Hello, what ______ your name?", o: ["is", "are", "am"], c: 0},
+            {q: "I ______ from Egypt.", o: ["is", "am", "are"], c: 1},
+            {q: "This is my friend. ______ name is Sarah.", o: ["Her", "His", "She"], c: 0},
+            {q: "______ you a student?", o: ["Is", "Are", "Do"], c: 1},
+            {q: "I have two ______.", o: ["brother", "brothers", "brother's"], c: 1},
+            {q: "There ______ a pen on the table.", o: ["is", "are", "some"], c: 0},
+            {q: "I ______ like coffee.", o: ["no", "doesn't", "don't"], c: 2},
+            {q: "Where ______ she live?", o: ["do", "does", "is"], c: 1},
+            {q: "Yesterday, I ______ to the park.", o: ["go", "goes", "went"], c: 2},
+            {q: "She ______ TV every evening.", o: ["watch", "watches", "watching"], c: 1},
+            {q: "______ you see that movie last night?", o: ["Do", "Did", "Done"], c: 1},
+            {q: "I am ______ than my brother.", o: ["tall", "taller", "tallest"], c: 1},
+            {q: "This is the ______ book I have ever read.", o: ["good", "better", "best"], c: 2},
+            {q: "______ many people are in the room?", o: ["How", "Who", "What"], c: 0},
+            {q: "I ______ speak English very well yet.", o: ["can't", "am not", "don't"], c: 0},
+            {q: "Look! It ______ now.", o: ["rains", "is raining", "rain"], c: 1},
+            {q: "I usually go to work ______ bus.", o: ["by", "with", "in"], c: 0},
+            {q: "Whose bag is this? It's ______.", o: ["mine", "my", "me"], c: 0},
+            {q: "We ______ to London last summer.", o: ["fly", "flew", "flown"], c: 1},
+            {q: "I ______ breakfast at 7 AM today.", o: ["eat", "ate", "eaten"], c: 1},
+            {q: "There isn't ______ milk in the fridge.", o: ["some", "any", "a"], c: 1},
+            {q: "I want ______ apple, please.", o: ["a", "an", "the"], c: 1},
+            {q: "He ______ play football very well.", o: ["can", "cans", "is can"], c: 0},
+            {q: "What are you ______ tomorrow?", o: ["do", "did", "doing"], c: 2},
+            {q: "My birthday is ______ October.", o: ["in", "on", "at"], c: 0},
+            {q: "______ you like a cup of tea?", o: ["Will", "Would", "Do"], c: 1},
+            {q: "They ______ their homework right now.", o: ["are doing", "do", "does"], c: 0},
+            {q: "I ______ never been to France.", o: ["am", "have", "had"], c: 1},
+            {q: "We ______ a new car last week.", o: ["buy", "bought", "buys"], c: 1},
+            {q: "Excuse me, ______ is the supermarket?", o: ["where", "when", "who"], c: 0},
+            
+            // B1-B2 (40)
+            {q: "I ______ English for five years.", o: ["study", "am studying", "have been studying"], c: 2},
+            {q: "If it rains, we ______ at home.", o: ["stay", "will stay", "would stay"], c: 1},
+            {q: "She told me that she ______ the movie before.", o: ["saw", "has seen", "had seen"], c: 2},
+            {q: "The bridge ______ built in 1920.", o: ["was", "were", "is"], c: 0},
+            {q: "You ______ smoke here; it's forbidden.", o: ["don't have to", "mustnst", "needn't"], c: 1},
+            {q: "I ______ go to the gym, but now I don't.", o: ["used to", "use to", "am used to"], c: 0},
+            {q: "I'm looking forward to ______ you.", o: ["see", "seeing", "saw"], c: 1},
+            {q: "He asked me ______ I was busy.", o: ["that", "if", "what"], c: 1},
+            {q: "By the time he arrived, the meeting ______.", o: ["finished", "has finished", "had finished"], c: 2},
+            {q: "I ______ my hair cut yesterday.", o: ["had", "did", "got to"], c: 0},
+            {q: "This is the man ______ car was stolen.", o: ["who", "whose", "whom"], c: 1},
+            {q: "I wish I ______ more money.", o: ["have", "had", "would have"], c: 1},
+            {q: "You ______ have told me; I already knew.", o: ["shouldn't", "needn't", "couldn't"], c: 1},
+            {q: "Although it was cold, ______ he went out without a coat.", o: ["but", "(no word)", "however"], c: 1},
+            {q: "I ______ be able to help you tomorrow.", o: ["will", "can", "would"], c: 0},
+            {q: "She is ______ at playing the piano than her sister.", o: ["more better", "much better", "more good"], c: 1},
+            {q: "I'll call you as soon as I ______.", o: ["arrive", "will arrive", "arrived"], c: 0},
+            {q: "I suggest ______ to the cinema.", o: ["go", "going", "to go"], c: 1},
+            {q: "The room ______ every day.", o: ["cleans", "is cleaned", "is cleaning"], c: 1},
+            {q: "He is ______ young to drive a car.", o: ["too", "enough", "very"], c: 0},
+            {q: "I ______ my keys. Have you seen them?", o: ["lost", "have lost", "lose"], c: 1},
+            {q: "If I ______ you, I wouldn't do that.", o: ["am", "was", "were"], c: 2},
+            {q: "Despite ______ hard, he failed the exam.", o: ["studying", "he studied", "study"], c: 0},
+            {q: "I'd rather you ______ here.", o: ["don't smoke", "didn't smoke", "not smoke"], c: 1},
+            {q: "I ______ to finish this by 5 PM.", o: ["must", "have", "should"], c: 1},
+            {q: "The food was ______ delicious that I ate it all.", o: ["such", "so", "very"], c: 1},
+            {q: "Neither James ______ Mary was at the party.", o: ["or", "nor", "and"], c: 1},
+            {q: "I ______ working when you called.", o: ["am", "was", "have been"], c: 1},
+            {q: "I'm not used to ______ up so early.", o: ["get", "getting", "got"], c: 1},
+            {q: "You haven't seen my phone, ______?", o: ["have you", "haven't you", "do you"], c: 0},
+            {q: "I ______ better go now.", o: ["would", "had", "should"], c: 1},
+            {q: "The movie was so ______ that I fell asleep.", o: ["bored", "boring", "bore"], c: 1},
+            {q: "I've been living here ______ 2010.", o: ["for", "since", "in"], c: 1},
+            {q: "This car is ______ expensive for me.", o: ["too", "enough", "quite"], c: 0},
+            {q: "He succeeded ______ passing the test.", o: ["in", "at", "on"], c: 0},
+            {q: "I ______ my homework when the lights went out.", o: ["did", "was doing", "have done"], c: 1},
+            {q: "______ you like to go out for dinner?", o: ["Do", "Would", "Should"], c: 1},
+            {q: "I don't know ______ she is.", o: ["who", "which", "what"], c: 0},
+            {q: "She ______ her promise.", o: ["kept", "held", "took"], c: 0},
+            {q: "I'll wait here until she ______.", o: ["comes", "will come", "come"], c: 0},
+            
+            // C1 (30)
+            {q: "Rarely ______ such a beautiful sunset.", o: ["I have seen", "have I seen", "saw I"], c: 1},
+            {q: "It's high time you ______ a job.", o: ["find", "found", "to find"], c: 1},
+            {q: "No sooner ______ left the house than it started to rain.", o: ["he had", "had he", "did he"], c: 1},
+            {q: "I'd rather ______ home tonight.", o: ["stay", "stayed", "to stay"], c: 0},
+            {q: "Supposing you ______ the lottery, what would you do?", o: ["win", "won", "had won"], c: 1},
+            {q: "He acted as if he ______ the boss.", o: ["is", "were", "has been"], c: 1},
+            {q: "______ for your help, I wouldn't have succeeded.", o: ["If it wasn't", "Had it not been", "But for"], c: 1},
+            {q: "The company is on the ______ of bankruptcy.", o: ["edge", "verge", "border"], c: 1},
+            {q: "I'm ______ to believe that he is telling the truth.", o: ["inclined", "intended", "supposed"], c: 0},
+            {q: "It's a ______ conclusion that they will win.", o: ["foregone", "finished", "final"], c: 0},
+            {q: "He ______ into the room as if nothing had happened.", o: ["strolled", "walked", "went"], c: 0},
+            {q: "I can't ______ the thought of losing him.", o: ["bear", "stand", "carry"], c: 0},
+            {q: "The project was ______ by technical problems.", o: ["hampered", "stopped", "prevented"], c: 0},
+            {q: "She has a ______ for languages.", o: ["gift", "talent", "knack"], c: 2},
+            {q: "The news was a bitter ______ to swallow.", o: ["pill", "cake", "food"], c: 0},
+            {q: "He is a ______ in the side of the government.", o: ["thorn", "stone", "stick"], c: 0},
+            {q: "The plan was ______ from the start.", o: ["flawed", "broken", "bad"], c: 0},
+            {q: "I was ______ by his generosity.", o: ["overwhelmed", "overtaken", "overdone"], c: 0},
+            {q: "He is always ______ about his achievements.", o: ["boasting", "talking", "saying"], c: 0},
+            {q: "The situation is ______ with danger.", o: ["fraught", "filled", "full"], c: 0},
+            {q: "Under no circumstances ______ you leave the building.", o: ["you should", "should you", "you must"], c: 1},
+            {q: "Little ______ did I know that he was lying.", o: ["(no word)", "do", "had"], c: 0},
+            {q: "Should you ______ any help, let me know.", o: ["need", "needing", "needed"], c: 0},
+            {q: "It is essential that he ______ on time.", o: ["is", "be", "was"], c: 1},
+            {q: "I was on the ______ of leaving when she called.", o: ["point", "edge", "limit"], c: 0},
+            {q: "The costs ______ the benefits.", o: ["outweigh", "outdo", "outrun"], c: 0},
+            {q: "He has an ______ memory.", o: ["impeccable", "perfect", "easy"], c: 0},
+            {q: "I was ______ to hear the news.", o: ["startled", "surprised", "shocked"], c: 0},
+            {q: "The evidence is ______.", o: ["conclusive", "final", "finished"], c: 0},
+            {q: "He is at a ______ end.", o: ["loose", "free", "lost"], c: 0}
+        ];
+
+        let currentQ = 0;
+        let score = 0;
+        let timer;
+        let timeLeft = 20;
+
+        function startPlacementTest() {
+            document.getElementById('testModal').style.display = 'block';
+            resetTest();
+        }
+
+        function resetTest() {
+            currentQ = 0; score = 0;
+            document.getElementById('testWelcome').style.display = 'block';
+            document.getElementById('testArea').style.display = 'none';
+            document.getElementById('testResult').style.display = 'none';
+        }
+
+        function runTest() {
+            document.getElementById('testWelcome').style.display = 'none';
+            document.getElementById('testArea').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            clearInterval(timer);
+            timeLeft = 20;
+            updateTimerUI();
+            
+            const qData = placementQuestions[currentQ];
+            document.getElementById('questionCount').innerText = `Question ${currentQ + 1} of 100`;
+            
+            let html = `<h2>${qData.q}</h2><div class="test-options">`;
+            qData.o.forEach((opt, idx) => {
+                html += `<button class="test-option-btn" onclick="selectOption(this, ${idx})">${opt}</button>`;
+            });
+            html += `</div>`;
+            
+            document.getElementById('questionContainer').innerHTML = html;
+
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                if(timeLeft <= 0) nextQuestion();
+            }, 1000);
+        }
+
+        function selectOption(btn, idx) {
+            const btns = document.querySelectorAll('.test-option-btn');
+            btns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            btn.dataset.chosen = idx;
+        }
+
+        function updateTimerUI() {
+            document.getElementById('timerText').innerText = `Time: ${timeLeft}s`;
+            document.getElementById('timerProgress').style.width = (timeLeft / 20) * 100 + "%";
+        }
+
+        function nextQuestion() {
+            const selected = document.querySelector('.test-option-btn.selected');
+            if(selected && parseInt(selected.dataset.chosen) === placementQuestions[currentQ].c) {
+                score++;
+            }
+
+            currentQ++;
+            if(currentQ < placementQuestions.length) {
+                showQuestion();
+            } else {
+                finishTest();
+            }
+        }
+
+        function finishTest() {
+            clearInterval(timer);
+            document.getElementById('testArea').style.display = 'none';
+            document.getElementById('testResult').style.display = 'block';
+            document.getElementById('finalScoreDisplay').innerText = `${score}/100`;
+            
+            let level = ""; let desc = "";
+            if(score <= 25) { level = "A1 (Beginner)"; desc = "أنت في بداية الطريق، تحتاج للتأسيس في القواعد والكلمات الأساسية."; }
+            else if(score <= 45) { level = "A2 (Elementary)"; desc = "مستواك مبتدئ، تستطيع فهم الجمل البسيطة ولكن تحتاج لتطوير مهارات المحادثة."; }
+            else if(score <= 65) { level = "B1 (Intermediate)"; desc = "مستوى متوسط، يمكنك إدارة حوارات يومية جيدة، تحتاج للعمل على القواعد الأكثر تعقيداً."; }
+            else if(score <= 80) { level = "B2 (Upper Intermediate)"; desc = "مستوى فوق المتوسط، تتحدث بطلاقة جيدة جداً، ينقصك بعض اللمسات الاحترافية."; }
+            else if(score <= 92) { level = "C1 (Advanced)"; desc = "مستوى متقدم، أنت محترف في اللغة وتستطيع فهم النصوص الأكاديمية الصعبة."; }
+            else { level = "C2 (Proficiency)"; desc = "مستوى خبير، لغتك تضاهي المتحدثين الأصليين!"; }
+            
+            document.getElementById('levelName').innerText = level;
+            document.getElementById('levelDesc').innerText = desc;
+        }
+
+        function closeTest() {
+            clearInterval(timer);
+            document.getElementById('testModal').style.display = 'none';
+        }
+
         const grammarContent = {
             pastSimple: {
                 title: "Past Simple (الماضي البسيط)",
-                explanation: `
-                    <p>نستخدمه لنتحدث عن أحداث بدأت وانتهت في وقت محدد في الماضي.</p>
-                    <h3>1. متى نستخدمه؟ (Usage)</h3>
-                    <ul>
-                        <li><strong>حدث انتهى تماماً:</strong> (I watched a movie yesterday).</li>
-                        <li><strong>قصة أو سلسلة أحداث متتالية:</strong> (I woke up, had breakfast, and went to work).</li>
-                        <li><strong>عادة قديمة انتهت:</strong> (I played football when I was a child).</li>
-                    </ul>
-                    <h3>2. كيف نصيغ الفعل؟ (Form)</h3>
-                    <p>أ- الأفعال المنتظمة (Regular Verbs): نضيف (ed) لنهايتها.</p>
-                    <ul>
-                        <li>Play → Played</li>
-                        <li>Watch → Watched</li>
-                        <li>إذا انتهى الفعل بـ e، نضيف d فقط: Like → Liked</li>
-                        <li>إذا انتهى بـ y وقبله حرف ساكن، نحذف y ونضيف ied: Study → Studied</li>
-                    </ul>
-                    <p>ب- الأفعال غير المنتظمة (Irregular Verbs): يتغير شكلها بالكامل ويجب حفظها.</p>
-                    <ul>
-                        <li>Go → Went</li>
-                        <li>Eat → Ate</li>
-                        <li>Have → Had</li>
-                        <li>Drink → Drank</li>
-                    </ul>
-                    <h3>3. النفي (Negative)</h3>
-                    <p>نستخدم البطل المساعد <strong>didn't</strong>. القاعدة الذهبية: بعد didn't، يعود الفعل لأصله (المصدر).</p>
-                    <ul>
-                        <li>الإثبات: I played tennis. | النفي: I didn't play tennis.</li>
-                        <li>الإثبات: He went home. | النفي: He didn't go home.</li>
-                    </ul>
-                    <h3>4. السؤال (Question)</h3>
-                    <p>نبدأ السؤال بكلمة <strong>Did</strong>، وأيضاً يعود الفعل لأصله.</p>
-                    <ul>
-                        <li>Did you eat lunch? (هل أكلت الغداء؟)</li>
-                        <li>Did they watch the match? (هل شاهدوا المباراة؟)</li>
-                    </ul>
-                    <h3>5. الكلمات الدالة (Keywords)</h3>
-                    <ul>
-                        <li>Yesterday (أمس)</li>
-                        <li>Last... (الماضي) ← Last week, Last year.</li>
-                        <li>...Ago (منذ) ← Two days ago (منذ يومين).</li>
-                        <li>In 2020 (في تاريخ قديم).</li>
-                    </ul>
-                    <h3>6. حالة خاصة: فعل "يكون" (Was / Were)</h3>
-                    <p>هذا الفعل لا يحتاج لـ did في النفي أو السؤال، هو يخدم نفسه بنفسه.</p>
-                    <div class="quiz-container" id="pastSimpleQuiz">
-                        <h2 style="text-align:center; color: var(--primary-red); margin-bottom:20px;">اختبر نفسك (Quiz)</h2>
-                        <div id="quizItems"></div>
-                    </div>
-                `,
+                explanation: `<p>نستخدمه لنتحدث عن أحداث بدأت وانتهت في وقت محدد في الماضي.</p><h3>1. متى نستخدمه؟ (Usage)</h3><ul><li><strong>حدث انتهى تماماً:</strong> (I watched a movie yesterday).</li><li><strong>قصة أو سلسلة أحداث متتالية:</strong> (I woke up, had breakfast, and went to work).</li><li><strong>عادة قديمة انتهت:</strong> (I played football when I was a child).</li></ul><h3>2. كيف نصيغ الفعل؟ (Form)</h3><p>أ- الأفعال المنتظمة (Regular Verbs): نضيف (ed) لنهايتها.</p><ul><li>Play → Played</li><li>Watch → Watched</li><li>إذا انتهى الفعل بـ e، نضيف d فقط: Like → Liked</li><li>إذا انتهى بـ y وقبله حرف ساكن، نحذف y ونضيف ied: Study → Studied</li></ul><p>ب- الأفعال غير المنتظمة (Irregular Verbs): يتغير شكلها بالكامل ويجب حفظها.</p><ul><li>Go → Went</li><li>Eat → Ate</li><li>Have → Had</li><li>Drink → Drank</li></ul><h3>3. النفي (Negative)</h3><p>نستخدم البطل المساعد <strong>didn't</strong>. القاعدة الذهبية: بعد didn't، يعود الفعل لأصله (المصدر).</p><ul><li>الإثبات: I played tennis. | النفي: I didn't play tennis.</li><li>الإثبات: He went home. | النفي: He didn't go home.</li></ul><h3>4. السؤال (Question)</h3><p>نبدأ السؤال بكلمة <strong>Did</strong>، وأيضاً يعود الفعل لأصله.</p><ul><li>Did you eat lunch? (هل أكلت الغداء؟)</li><li>Did they watch the match? (هل شاهدوا المباراة؟)</li></ul><h3>5. الكلمات الدالة (Keywords)</h3><ul><li>Yesterday (أمس)</li><li>Last... (الماضي) ← Last week, Last year.</li><li>...Ago (منذ) ← Two days ago (منذ يومين).</li><li>In 2020 (في تاريخ قديم).</li></ul><h3>6. حالة خاصة: فعل "يكون" (Was / Were)</h3><p>هذا الفعل لا يحتاج لـ did في النفي أو السؤال، هو يخدم نفسه بنفسه.</p><div class="quiz-container" id="pastSimpleQuiz"><h2 style="text-align:center; color: var(--primary-red); margin-bottom:20px;">اختبر نفسك (Quiz)</h2><div id="quizItems"></div></div>`,
                 questions: [
                     { q: "Yesterday, I ________ a very interesting book.", options: ["readed", "reads", "read", "reading"], correct: 2, feed: "c) read (لأن الماضي من read يُكتب كما هو ولكن يُنطق 'ريد' مثل لون الأحمر)." },
                     { q: "They ________ to the mall last weekend.", options: ["go", "went", "gone", "goed"], correct: 1, feed: "b) went (لأن went هو الماضي غير المنتظم من go)." },
@@ -330,32 +552,21 @@
             const data = grammarContent[key];
             document.getElementById('grammarTitle').innerText = data.title;
             document.getElementById('grammarBody').innerHTML = data.explanation;
-            
             const quizItems = document.getElementById('quizItems');
             data.questions.forEach((item, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'quiz-question';
-                qDiv.innerHTML = `
-                    <p>${index + 1}. ${item.q}</p>
-                    <div class="options-grid">
-                        ${item.options.map((opt, i) => `<button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${key}')">${opt}</button>`).join('')}
-                    </div>
-                    <div class="feedback" id="feed-${index}"></div>
-                `;
+                qDiv.innerHTML = `<p>${index + 1}. ${item.q}</p><div class="options-grid">${item.options.map((opt, i) => `<button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${key}')">${opt}</button>`).join('')}</div><div class="feedback" id="feed-${index}"></div>`;
                 quizItems.appendChild(qDiv);
             });
-            
             document.getElementById('grammarModal').style.display = 'block';
         }
 
         function checkAnswer(btn, qIdx, oIdx, key) {
             const question = grammarContent[key].questions[qIdx];
             const feedback = document.getElementById(`feed-${qIdx}`);
-            const parent = btn.parentElement;
-            const buttons = parent.querySelectorAll('.option-btn');
-
+            const buttons = btn.parentElement.querySelectorAll('.option-btn');
             buttons.forEach(b => b.disabled = true);
-
             if (oIdx === question.correct) {
                 btn.classList.add('correct');
                 feedback.innerHTML = "إجابة صحيحة! " + question.feed;
@@ -369,11 +580,8 @@
             feedback.style.display = "block";
         }
 
-        function closeGrammar() {
-            document.getElementById('grammarModal').style.display = 'none';
-        }
+        function closeGrammar() { document.getElementById('grammarModal').style.display = 'none'; }
 
-        // Original Vocab Data and Logic (Preserved exactly)
         const vocabData = {
             a1: [
                 {en: "Be", ar: "يكون", icon: "fa-circle-check", ex: "I am a student.", exAr: "أنا طالب"},
@@ -391,7 +599,7 @@
                 {en: "Help", ar: "يساعد", icon: "fa-handshake-angle", ex: "Can you help me?", exAr: "هل يمكنك مساعدتي؟"},
                 {en: "Know", ar: "يعرف", icon: "fa-lightbulb", ex: "I know his name.", exAr: "أعرف اسمه"},
                 {en: "Understand", ar: "يفهم", icon: "fa-brain", ex: "I understand the lesson.", exAr: "أفهم الدرس"},
-                {en: "Buy", ar: "يشتري", icon: "fa-cart-shopping", ex: "I buy milk every day.", exAr: "أشتري حليباً كل يوم"},
+                {en: "Buy", ar: "يشتري", icon: "fa-cart-shopping", ex: "I buy milk every day.", exAr: "أشري حليباً كل يوم"},
                 {en: "Speak", ar: "يتحدث", icon: "fa-comments", ex: "I speak Arabic.", exAr: "أتحدث العربية"},
                 {en: "Write", ar: "يكتب", icon: "fa-pen-clip", ex: "Write your name here.", exAr: "اكتب اسمك هنا"},
                 {en: "Read", ar: "يقرأ", icon: "fa-book-open", ex: "I read a book.", exAr: "أقرأ كتاباً"},
@@ -519,6 +727,7 @@
         window.onclick = function(event) {
             if (event.target == document.getElementById('vocabModal')) closeVocab();
             if (event.target == document.getElementById('grammarModal')) closeGrammar();
+            if (event.target == document.getElementById('testModal')) closeTest();
         }
     </script>
 </body>
