@@ -37,14 +37,14 @@
         /* Test Modal Specifics */
         #testModal { direction: ltr; text-align: left; }
         .test-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; }
         .timer-progress { width: 100%; height: 100%; background: var(--primary-red); transition: width 1s linear; }
         .question-card h2 { font-size: 1.4rem; color: var(--primary-blue); margin-bottom: 25px; line-height: 1.4; }
         .test-options { display: grid; gap: 12px; }
         .test-option-btn { padding: 15px; border: 2px solid #eee; border-radius: 12px; background: white; cursor: pointer; font-size: 1.1rem; transition: 0.2s; text-align: left; }
         .test-option-btn:hover { border-color: var(--primary-blue); background: #f0f7ff; }
         .test-option-btn.selected { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
-        .test-footer { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 20px; }
+        .test-footer { margin-top: 30px; display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid #eee; padding-top: 20px; }
         .btn-next { background: #25d366; color: white; padding: 10px 30px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
         .result-screen { text-align: center; padding: 40px 20px; direction: rtl; }
         .result-score { font-size: 4rem; font-weight: 900; color: var(--primary-red); margin: 20px 0; }
@@ -131,7 +131,7 @@
 
     <header>
         <div class="hero-content">
-            <a href='https://postimg.cc/47Y7gwsH' target='_blank'><img src='https://i.postimg.cc/Px4m1F7y/ahjz-alan-20260103-215647-0000.png' border='0' alt='ahjz-alan-20260103-215647-0000' class="hero-banner"></a>
+            <img src='https://i.postimg.cc/Px4m1F7y/ahjz-alan-20260103-215647-0000.png' alt='أهلاً بك' class="hero-banner">
             <h1>أهلاً بك في Go English</h1>
             <div class="hero-tagline">مع مستر علاء خالد هتحترف الانجليزي</div>
             <p>المكان الأفضل لتطوير مهاراتك في اللغة الإنجليزية بالبحيرة. نركز على النطق الصحيح، الاستماع، والمحادثة بأساليب تعليمية حديثة.</p>
@@ -155,8 +155,7 @@
                 <h2 style="color: var(--primary-blue); margin-bottom: 20px;">English Level Placement Test</h2>
                 <ul style="text-align: left; display: inline-block; margin-bottom: 30px; direction: ltr;">
                     <li>• 100 Multiple choice questions.</li>
-                    <li>• 20 Seconds per question.</li>
-                    <li>• Auto-advance when time runs out.</li>
+                    <li>• No time limit - Answer at your own pace.</li>
                     <li>• Final level based on your score.</li>
                 </ul>
                 <button class="btn-test" onclick="runTest()">Start Now</button>
@@ -169,7 +168,6 @@
                     <div id="questionContainer" class="question-card">
                         </div>
                     <div class="test-footer">
-                        <span id="timerText" style="font-weight: bold; color: var(--primary-red);">Time: 20s</span>
                         <button class="btn-next" onclick="nextQuestion()">Next Question</button>
                     </div>
                 </div>
@@ -431,8 +429,6 @@
 
         let currentQ = 0;
         let score = 0;
-        let timer;
-        let timeLeft = 20;
 
         function startPlacementTest() {
             document.getElementById('testModal').style.display = 'block';
@@ -453,10 +449,6 @@
         }
 
         function showQuestion() {
-            clearInterval(timer);
-            timeLeft = 20;
-            updateTimerUI();
-            
             const qData = placementQuestions[currentQ];
             document.getElementById('questionCount').innerText = `Question ${currentQ + 1} of 100`;
             
@@ -467,12 +459,6 @@
             html += `</div>`;
             
             document.getElementById('questionContainer').innerHTML = html;
-
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimerUI();
-                if(timeLeft <= 0) nextQuestion();
-            }, 1000);
         }
 
         function selectOption(btn, idx) {
@@ -480,11 +466,6 @@
             btns.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             btn.dataset.chosen = idx;
-        }
-
-        function updateTimerUI() {
-            document.getElementById('timerText').innerText = `Time: ${timeLeft}s`;
-            document.getElementById('timerProgress').style.width = (timeLeft / 20) * 100 + "%";
         }
 
         function nextQuestion() {
@@ -502,7 +483,6 @@
         }
 
         function finishTest() {
-            clearInterval(timer);
             document.getElementById('testArea').style.display = 'none';
             document.getElementById('testResult').style.display = 'block';
             document.getElementById('finalScoreDisplay').innerText = `${score}/100`;
@@ -519,9 +499,21 @@
             document.getElementById('levelDesc').innerText = desc;
         }
 
+        // الوظيفة المحدثة لطلب التأكيد قبل الخروج
         function closeTest() {
-            clearInterval(timer);
-            document.getElementById('testModal').style.display = 'none';
+            const testArea = document.getElementById('testArea');
+            // نتحقق إذا كان المستخدم في شاشة الاختبار النشطة
+            if (testArea.style.display === 'block') {
+                const confirmExit = confirm("هل أنت متأكد من رغبتك في إنهاء الاختبار؟ سيتم فقدان تقدمك الحالي.");
+                if (confirmExit) {
+                    document.getElementById('testModal').style.display = 'none';
+                    resetTest();
+                }
+            } else {
+                // إذا كان في شاشة الترحيب أو النتيجة يغلق مباشرة
+                document.getElementById('testModal').style.display = 'none';
+                resetTest();
+            }
         }
 
         const grammarContent = {
@@ -553,6 +545,7 @@
             document.getElementById('grammarTitle').innerText = data.title;
             document.getElementById('grammarBody').innerHTML = data.explanation;
             const quizItems = document.getElementById('quizItems');
+            quizItems.innerHTML = "";
             data.questions.forEach((item, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'quiz-question';
@@ -589,104 +582,11 @@
                 {en: "Do", ar: "يفعل", icon: "fa-gear", ex: "I do my homework.", exAr: "أفعل واجبي"},
                 {en: "Go", ar: "يذهب", icon: "fa-person-walking", ex: "I go to the park.", exAr: "أذهب إلى المنتزه"},
                 {en: "Want", ar: "يريد", icon: "fa-heart", ex: "I want a coffee.", exAr: "أريد قهوة"},
-                {en: "Like", ar: "يحب", icon: "fa-thumbs-up", ex: "I like pizza.", exAr: "أحب البيتزا"},
-                {en: "See", ar: "يرى", icon: "fa-eye", ex: "I see a bird.", exAr: "أرى عصفوراً"},
-                {en: "Eat", ar: "يأكل", icon: "fa-utensils", ex: "I eat an apple.", exAr: "آكل تفاحة"},
-                {en: "Drink", ar: "يشرب", icon: "fa-glass-water", ex: "I drink water.", exAr: "أشرب الماء"},
-                {en: "Sleep", ar: "ينام", icon: "fa-bed", ex: "I sleep early.", exAr: "أنام مبكراً"},
-                {en: "Work", ar: "يعمل", icon: "fa-briefcase", ex: "I work in an office.", exAr: "أعمل في مكتب"},
-                {en: "Study", ar: "يدرس", icon: "fa-graduation-cap", ex: "I study English.", exAr: "أدرس الإنجليزية"},
-                {en: "Help", ar: "يساعد", icon: "fa-handshake-angle", ex: "Can you help me?", exAr: "هل يمكنك مساعدتي؟"},
-                {en: "Know", ar: "يعرف", icon: "fa-lightbulb", ex: "I know his name.", exAr: "أعرف اسمه"},
-                {en: "Understand", ar: "يفهم", icon: "fa-brain", ex: "I understand the lesson.", exAr: "أفهم الدرس"},
-                {en: "Buy", ar: "يشتري", icon: "fa-cart-shopping", ex: "I buy milk every day.", exAr: "أشري حليباً كل يوم"},
-                {en: "Speak", ar: "يتحدث", icon: "fa-comments", ex: "I speak Arabic.", exAr: "أتحدث العربية"},
-                {en: "Write", ar: "يكتب", icon: "fa-pen-clip", ex: "Write your name here.", exAr: "اكتب اسمك هنا"},
-                {en: "Read", ar: "يقرأ", icon: "fa-book-open", ex: "I read a book.", exAr: "أقرأ كتاباً"},
-                {en: "Listen", ar: "يستمع", icon: "fa-ear-listen", ex: "Listen to the teacher.", exAr: "استمع للمعلم"},
-                {en: "Family", ar: "عائلة", icon: "fa-users", ex: "I love my family.", exAr: "أحب عائلتي"},
-                {en: "Friend", ar: "صديق", icon: "fa-user-group", ex: "Sarah is my friend.", exAr: "سارة صديقتي"},
-                {en: "Home", ar: "بيت", icon: "fa-house", ex: "I stay at home.", exAr: "أبقى في البيت"},
-                {en: "School", ar: "مدرسة", icon: "fa-school", ex: "The school is big.", exAr: "المدرسة كبيرة"},
-                {en: "Work", ar: "عمل", icon: "fa-building", ex: "I go to work by bus.", exAr: "أذهب للعمل بالحافلة"},
-                {en: "Time", ar: "وقت", icon: "fa-clock", ex: "What time is it?", exAr: "ما الوقت؟"},
-                {en: "Money", ar: "مال", icon: "fa-money-bill-wave", ex: "I don't have money.", exAr: "ليس معي مال"},
-                {en: "Food", ar: "طعام", icon: "fa-bowl-food", ex: "The food is delicious.", exAr: "الطعام لذيذ"},
-                {en: "Water", ar: "ماء", icon: "fa-droplet", ex: "Drink more water.", exAr: "اشرب ماءً أكثر"},
-                {en: "Book", ar: "كتاب", icon: "fa-book", ex: "This book is interesting.", exAr: "هذا الكتاب ممتع"},
-                {en: "City", ar: "مدينة", icon: "fa-city", ex: "Cairo is a big city.", exAr: "القاهرة مدينة كبيرة"},
-                {en: "Street", ar: "شارع", icon: "fa-road", ex: "The street is busy.", exAr: "الشارع مزدحم"},
-                {en: "Store", ar: "متجر", icon: "fa-shop", ex: "The store is closed.", exAr: "المتجر مغلق"},
-                {en: "Car", ar: "سيارة", icon: "fa-car", ex: "My car is white.", exAr: "سيارتي بيضاء"},
-                {en: "Phone", ar: "هاتف", icon: "fa-mobile-screen", ex: "Where is my phone?", exAr: "أين هاتفي؟"},
-                {en: "Day", ar: "يوم", icon: "fa-calendar-day", ex: "It is a sunny day.", exAr: "إنه يوم مشمس"},
-                {en: "Week", ar: "أسبوع", icon: "fa-calendar-week", ex: "See you next week.", exAr: "أراك الأسبوع القادم"},
-                {en: "Month", ar: "شهر", icon: "fa-calendar-days", ex: "This month is cold.", exAr: "هذا الشهر بارد"},
-                {en: "Year", ar: "سنة", icon: "fa-calendar", ex: "Happy New Year!", exAr: "سنة جديدة سعيدة"},
-                {en: "Life", ar: "حياة", icon: "fa-seedling", ex: "Life is beautiful.", exAr: "الحياة جميلة"},
-                {en: "Good", ar: "جيد", icon: "fa-face-smile", ex: "This is a good idea.", exAr: "هذه فكرة جيدة"},
-                {en: "Bad", ar: "سيء", icon: "fa-face-frown", ex: "The weather is bad.", exAr: "الطقس سيء"},
-                {en: "Big", ar: "كبير", icon: "fa-maximize", ex: "I have a big family.", exAr: "عندي عائلة كبيرة"},
-                {en: "Small", ar: "صغير", icon: "fa-minimize", ex: "My room is small.", exAr: "غرفتي صغيرة"},
-                {en: "Happy", ar: "سعيد", icon: "fa-face-laugh-beam", ex: "I am very happy.", exAr: "أنا سعيد جداً"},
-                {en: "Sad", ar: "حزين", icon: "fa-face-sad-tear", ex: "Don't be sad.", exAr: "لا تحزن"},
-                {en: "Hot", ar: "حار", icon: "fa-temperature-high", ex: "The tea is hot.", exAr: "الشاي ساخن"},
-                {en: "Cold", ar: "بارد", icon: "fa-temperature-low", ex: "I need a cold drink.", exAr: "أريد مشروباً بارداً"},
-                {en: "New", ar: "جديد", icon: "fa-sparkles", ex: "I have new shoes.", exAr: "عندي حذاء جديد"},
-                {en: "Old", ar: "قديم", icon: "fa-clock-rotate-left", ex: "This car is old.", exAr: "هذه السيارة قديمة"},
-                {en: "Easy", ar: "سهل", icon: "fa-check", ex: "English is easy.", exAr: "الإنجليزية سهلة"},
-                {en: "Hard", ar: "صعب", icon: "fa-lock", ex: "The exam was hard.", exAr: "الامتحان كان صعباً"},
-                {en: "Fast", ar: "سريع", icon: "fa-bolt", ex: "He is a fast runner.", exAr: "هو عداء سريع"},
-                {en: "Slow", ar: "بطيء", icon: "fa-snail", ex: "The internet is slow.", exAr: "الإنترنت بطيء"},
-                {en: "Beautiful", ar: "جميل", icon: "fa-wand-magic-sparkles", ex: "The flower is beautiful.", exAr: "الزهرة جميلة"},
-                {en: "Hungry", ar: "جائع", icon: "fa-cookie", ex: "I am hungry, let's eat.", exAr: "أنا جائع، لنأكل"},
-                {en: "Thirsty", ar: "عطشان", icon: "fa-faucet-drip", ex: "I am thirsty for juice.", exAr: "أنا عطشان للعصير"},
-                {en: "Tired", ar: "متعب", icon: "fa-battery-quarter", ex: "I feel tired today.", exAr: "أشعر بالتعب اليوم"},
-                {en: "Cheap", ar: "رخيص", icon: "fa-tag", ex: "This pen is cheap.", exAr: "هذا القلم رخيص"},
-                {en: "Expensive", ar: "غالي", icon: "fa-gem", ex: "Gold is expensive.", exAr: "الذهب غالي"},
-                {en: "Always", ar: "دائماً", icon: "fa-rotate", ex: "I always wake up early.", exAr: "أنا دائماً أستيقظ مبكراً"},
-                {en: "Never", ar: "أبداً", icon: "fa-circle-xmark", ex: "I never smoke.", exAr: "أنا لا أدخن أبداً"},
-                {en: "Sometimes", ar: "أحياناً", icon: "fa-hourglass-half", ex: "I sometimes walk to work.", exAr: "أحياناً أمشي للعمل"},
-                {en: "Today", ar: "اليوم", icon: "fa-sun", ex: "It is Monday today.", exAr: "اليوم هو الاثنين"},
-                {en: "Yesterday", ar: "أمس", icon: "fa-left-long", ex: "I was busy yesterday.", exAr: "كنت مشغولاً أمس"},
-                {en: "Tomorrow", ar: "غداً", icon: "fa-right-long", ex: "Call me tomorrow.", exAr: "اتصل بي غداً"},
-                {en: "Now", ar: "الآن", icon: "fa-stopwatch", ex: "I am studying now.", exAr: "أنا أدرس الآن"},
-                {en: "Later", ar: "لاحقاً", icon: "fa-clock-four", ex: "I will see you later.", exAr: "سأراك لاحقاً"},
-                {en: "Here", ar: "هنا", icon: "fa-location-dot", ex: "Sit here, please.", exAr: "اجلس هنا من فضلك"},
-                {en: "There", ar: "هناك", icon: "fa-location-arrow", ex: "The park is over there.", exAr: "المنتزه هناك"},
-                {en: "Because", ar: "لأن", icon: "fa-question-circle", ex: "I study because I want to learn.", exAr: "أدرس لأنني أريد أن أتعلم"},
-                {en: "But", ar: "لكن", icon: "fa-shuffle", ex: "I like tea, but I hate milk.", exAr: "أحب الشاي لكني أكره الحليب"},
-                {en: "And", ar: "و", icon: "fa-plus", ex: "I have a cat and a dog.", exAr: "عندي قط وكلب"},
-                {en: "Or", ar: "أو", icon: "fa-arrows-left-right", ex: "Do you want tea or coffee?", exAr: "هل تريد شاياً أم قهوة؟"},
-                {en: "With", ar: "مع", icon: "fa-link", ex: "I go with my brother.", exAr: "أذهب مع أخي"},
-                {en: "Without", ar: "بدون", icon: "fa-link-slash", ex: "I drink coffee without sugar.", exAr: "أشرب القهوة بدون سكر"},
-                {en: "Very", ar: "جداً", icon: "fa-up-long", ex: "It is very hot today.", exAr: "الجو حار جداً اليوم"},
-                {en: "Too", ar: "أيضاً", icon: "fa-angles-up", ex: "This shirt is too small.", exAr: "هذا القميص صغير جداً"},
-                {en: "Maybe", ar: "ربما", icon: "fa-circle-question", ex: "Maybe he is late.", exAr: "ربما هو متأخر"},
-                {en: "Really", ar: "حقاً", icon: "fa-exclamation", ex: "I really like this place.", exAr: "أنا حقاً أحب هذا المكان"},
-                {en: "Question", ar: "سؤال", icon: "fa-circle-question", ex: "I have a question.", exAr: "عندي سؤال"},
-                {en: "Answer", ar: "جواب", icon: "fa-message", ex: "I know the answer.", exAr: "أعرف الجواب"},
-                {en: "Name", ar: "اسم", icon: "fa-id-card", ex: "My name is Adam.", exAr: "اسمي آدم"},
-                {en: "Address", ar: "عنوان", icon: "fa-map-pin", ex: "What is your address?", exAr: "ما هو عنوانك؟"},
-                {en: "Number", ar: "رقم", icon: "fa-hashtag", ex: "Give me your phone number.", exAr: "أعطني رقم هاتفك"},
-                {en: "People", ar: "ناس", icon: "fa-people-group", ex: "There are many people here.", exAr: "يوجد الكثير من الناس هنا"},
-                {en: "Place", ar: "مكان", icon: "fa-location-dot", ex: "This is a nice place.", exAr: "هذا مكان لطيف"},
-                {en: "Thing", ar: "شيء", icon: "fa-box", ex: "What is that thing?", exAr: "ما هذا الشيء؟"},
-                {en: "Way", ar: "طريق", icon: "fa-route", ex: "Show me the way.", exAr: "أرني الطريق"},
-                {en: "Problem", ar: "مشكلة", icon: "fa-triangle-exclamation", ex: "No problem.", exAr: "لا مشكلة"},
-                {en: "Help", ar: "نجدة", icon: "fa-life-ring", ex: "I need some help.", exAr: "أحتاج بعض المساعدة"},
-                {en: "Morning", ar: "صباح", icon: "fa-mountain-sun", ex: "Good morning!", exAr: "صباح الخير"},
-                {en: "Night", ar: "ليل", icon: "fa-moon", ex: "I work at night.", exAr: "أعمل في الليل"},
-                {en: "Menu", ar: "قائمة طعام", icon: "fa-rectangle-list", ex: "Can I see the menu?", exAr: "هل يمكنني رؤية قائمة الطعام؟"},
-                {en: "Bill", ar: "فاتورة", icon: "fa-file-invoice-dollar", ex: "Can I have the bill, please?", exAr: "الحساب من فضلك"},
-                {en: "Key", ar: "مفتاح", icon: "fa-key", ex: "I lost my house key.", exAr: "فقدت مفتاح منزلي"},
-                {en: "Ticket", ar: "تذكرة", icon: "fa-ticket", ex: "I have a train ticket.", exAr: "معي تذكرة قطار"},
-                {en: "Bus", ar: "حافلة", icon: "fa-bus", ex: "The bus arrives at 10.", exAr: "الحافلة تصل الساعة 10"},
                 {en: "Airport", ar: "مطار", icon: "fa-plane-arrival", ex: "Take me to the airport.", exAr: "خذني إلى المطار"},
                 {en: "Map", ar: "خريطة", icon: "fa-map", ex: "Look at the map.", exAr: "انظر إلى الخريطة"}
             ],
-            b1: [{en: "Experience", ar: "خبرة", icon: "fa-star"}, {en: "Business", ar: "عمل", icon: "fa-briefcase"}, {en: "Decision", ar: "قرار", icon: "fa-gavel"}, {en: "Environment", ar: "بيئة", icon: "fa-leaf"}],
-            c1: [{en: "Hypothesis", ar: "فرضية", icon: "fa-flask"}, {en: "Philosophy", ar: "فلسفة", icon: "fa-brain"}, {en: "Infrastructure", ar: "بنية تحتية", icon: "fa-bridge"}]
+            b1: [{en: "Experience", ar: "خبرة", icon: "fa-star"}, {en: "Business", ar: "عمل", icon: "fa-briefcase"}],
+            c1: [{en: "Hypothesis", ar: "فرضية", icon: "fa-flask"}, {en: "Philosophy", ar: "فلسفة", icon: "fa-brain"}]
         };
 
         function openVocab(level) {
@@ -724,10 +624,13 @@
             window.speechSynthesis.speak(msgWord);
         }
 
+        // تحديث منطق النقر خارج النافذة ليشمل حماية الاختبار
         window.onclick = function(event) {
+            if (event.target == document.getElementById('testModal')) {
+                closeTest();
+            }
             if (event.target == document.getElementById('vocabModal')) closeVocab();
             if (event.target == document.getElementById('grammarModal')) closeGrammar();
-            if (event.target == document.getElementById('testModal')) closeTest();
         }
     </script>
 </body>
