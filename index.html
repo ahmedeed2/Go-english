@@ -20,7 +20,34 @@
         /* Navigation */
         nav { background: var(--white); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
         .nav-logo img { height: 75px; width: auto; }
-        .contact-top-btn { background: var(--primary-blue); color: white; padding: 8px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
+        
+        /* Auth Styles */
+        .auth-container { display: flex; align-items: center; }
+        .btn-auth { background: var(--primary-blue); color: white; padding: 8px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; }
+        
+        /* Updated User Info Style */
+        #user-info { 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 5px; 
+            text-align: center;
+        }
+        .btn-logout { 
+            background: var(--primary-red); 
+            color: white; 
+            padding: 4px 15px; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+            border: none; 
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-logout:hover { opacity: 0.9; transform: scale(1.05); }
+
+        .auth-modal-content { max-width: 400px !important; text-align: center; }
+        .auth-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .auth-input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Cairo'; }
 
         /* Sidebar Styles */
         .sidebar {
@@ -179,10 +206,31 @@
                 <img src="https://i.postimg.cc/7hxvdC7x/file-0000000095dc71f48b62b00798f8b2b2.png" alt="Go English Logo">
             </div>
         </div>
-        <a href="tel:01271032448" class="contact-top-btn">
-            <i class="fas fa-phone-alt"></i> اتصل بنا
-        </a>
+        
+        <div class="auth-container">
+            <div id="auth-buttons">
+                <button class="btn-auth" onclick="openAuthModal()">تسجيل الدخول</button>
+            </div>
+            <div id="user-info">
+                <span id="user-display-name" style="font-weight: bold; color: var(--primary-blue); font-size: 0.95rem;"></span>
+                <button class="btn-logout" onclick="logout()">خروج</button>
+            </div>
+        </div>
     </nav>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content auth-modal-content">
+            <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+            <h2 id="authTitle" style="color: var(--primary-blue);">تسجيل الدخول</h2>
+            <div class="auth-form">
+                <input type="email" id="authEmail" class="auth-input" placeholder="البريد الإلكتروني">
+                <input type="password" id="authPassword" class="auth-input" placeholder="كلمة المرور">
+                <button id="mainAuthBtn" class="btn-auth" onclick="handleAuth()">دخول</button>
+                <p id="authSwitch" style="cursor:pointer; color: var(--primary-blue); font-size: 0.9rem;" onclick="toggleAuthMode()">ليس لديك حساب؟ سجل الآن</p>
+                <p id="authError" style="color: var(--primary-red); font-size: 0.8rem; display: none;"></p>
+            </div>
+        </div>
+    </div>
 
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
@@ -218,12 +266,21 @@
             
             <div id="testWelcome" style="text-align: center; padding: 20px;">
                 <h2 style="color: var(--primary-blue); margin-bottom: 20px;">English Level Placement Test</h2>
+                
+                <div id="previousResultArea" style="display: none; background: #f0f7ff; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--primary-blue);">
+                    <p style="color: var(--primary-blue); font-weight: bold;">لقد قمت بإجراء الاختبار مسبقاً:</p>
+                    <div id="oldScore" style="font-size: 1.5rem; font-weight: 900; color: var(--primary-red);"></div>
+                    <div id="oldLevel" style="font-weight: bold;"></div>
+                </div>
+
                 <ul style="text-align: left; display: inline-block; margin-bottom: 30px; direction: ltr;">
                     <li>• 100 Multiple choice questions.</li>
                     <li>• No time limit - Answer at your own pace.</li>
                     <li>• Final level based on your score.</li>
                 </ul>
-                <button class="btn-test" onclick="runTest()">Start Now</button>
+                <div id="testStartButtons">
+                    <button class="btn-test" onclick="runTest()">Start Now</button>
+                </div>
             </div>
 
             <div id="testArea" style="display: none;">
@@ -384,12 +441,11 @@
     </section>
 
     <script type="module">
-        // Import Firebase functions from CDN
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
           apiKey: "AIzaSyDLBzMNHKlJmKnHAEqlEAIv8WQi7bHbQvM",
           authDomain: "gooo-985e3.firebaseapp.com",
@@ -400,15 +456,92 @@
           measurementId: "G-VL6S9WSXC5"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app); // Making Auth available for future login forms
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        console.log("Firebase initialized successfully on Go English!");
+        let currentUser = null;
+
+        // Global Auth Functions
+        let isSignUpMode = false;
+
+        window.openAuthModal = () => document.getElementById('authModal').style.display = 'block';
+        window.closeAuthModal = () => document.getElementById('authModal').style.display = 'none';
+        
+        window.toggleAuthMode = () => {
+            isSignUpMode = !isSignUpMode;
+            document.getElementById('authTitle').innerText = isSignUpMode ? "إنشاء حساب جديد" : "تسجيل الدخول";
+            document.getElementById('mainAuthBtn').innerText = isSignUpMode ? "تسجيل" : "دخول";
+            document.getElementById('authSwitch').innerText = isSignUpMode ? "لديك حساب بالفعل؟ سجل دخول" : "ليس لديك حساب؟ سجل الآن";
+        };
+
+        window.handleAuth = async () => {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const errorEl = document.getElementById('authError');
+            errorEl.style.display = 'none';
+
+            try {
+                if (isSignUpMode) {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+                closeAuthModal();
+            } catch (error) {
+                errorEl.innerText = "خطأ: " + error.message;
+                errorEl.style.display = 'block';
+            }
+        };
+
+        window.logout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            const authBtns = document.getElementById('auth-buttons');
+            const userInfo = document.getElementById('user-info');
+            const userName = document.getElementById('user-display-name');
+
+            if (user) {
+                currentUser = user;
+                authBtns.style.display = 'none';
+                userInfo.style.display = 'flex';
+                userName.innerText = user.email.split('@')[0];
+            } else {
+                currentUser = null;
+                authBtns.style.display = 'block';
+                userInfo.style.display = 'none';
+            }
+        });
+
+        // --- إضافة وظيفة حفظ النتيجة ---
+        window.saveTestResult = async (score, level) => {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "userResults", currentUser.uid), {
+                    score: score,
+                    level: level,
+                    date: new Date().toISOString()
+                });
+                console.log("Result saved!");
+            } catch (e) {
+                console.error("Error saving result: ", e);
+            }
+        };
+
+        // --- إضافة وظيفة جلب النتيجة ---
+        window.getPreviousResult = async () => {
+            if (!currentUser) return null;
+            const docRef = doc(db, "userResults", currentUser.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                return docSnap.data();
+            }
+            return null;
+        };
     </script>
+
     <script>
-        // --- Original Website Scripts ---
+        // --- Original Website Scripts (Unchanged) ---
         let isTesting = false;
 
         window.addEventListener('beforeunload', function (e) {
@@ -572,9 +705,28 @@
         let currentQ = 0;
         let score = 0;
 
-        function startPlacementTest() {
-            document.getElementById('testModal').style.display = 'block';
+        async function startPlacementTest() {
+            const modal = document.getElementById('testModal');
+            modal.style.display = 'block';
             resetTest();
+
+            // فحص إذا كان هناك نتيجة سابقة
+            const prev = await window.getPreviousResult();
+            const prevArea = document.getElementById('previousResultArea');
+            const startBtns = document.getElementById('testStartButtons');
+
+            if (prev) {
+                prevArea.style.display = 'block';
+                document.getElementById('oldScore').innerText = `الدرجة السابقة: ${prev.score}/100`;
+                document.getElementById('oldLevel').innerText = `المستوى: ${prev.level}`;
+                startBtns.innerHTML = `
+                    <button class="btn-test" onclick="runTest()">إعادة الاختبار</button>
+                    <p style="margin-top:10px; color:#666; font-size:0.9rem;">سيتم استبدال نتيجتك القديمة بالجديدة.</p>
+                `;
+            } else {
+                prevArea.style.display = 'none';
+                startBtns.innerHTML = `<button class="btn-test" onclick="runTest()">Start Now</button>`;
+            }
         }
 
         function resetTest() {
@@ -627,7 +779,7 @@
             }
         }
 
-        function finishTest() {
+        async function finishTest() {
             isTesting = false;
             document.getElementById('testArea').style.display = 'none';
             document.getElementById('testResult').style.display = 'block';
@@ -643,6 +795,9 @@
             
             document.getElementById('levelName').innerText = level;
             document.getElementById('levelDesc').innerText = desc;
+
+            // حفظ النتيجة في Firebase
+            await window.saveTestResult(score, level);
         }
 
         function closeTest() {
@@ -666,7 +821,7 @@
                     { q: "________ you call me this morning?", options: ["Do", "Was", "Did", "Were"], correct: 2, feed: "c) Did (نبدأ السؤال عن الماضي بـ Did)." },
                     { q: "I ________ my keys in the car.", options: ["lose", "lost", "losed", "losing"], correct: 1, feed: "b) lost (الماضي من lose وهو فعل غير منتظم)." },
                     { q: "They ________ at the party two days ago.", options: ["weren't", "wasn't", "didn't", "not were"], correct: 0, feed: "a) weren't (نفي فعل 'يكون' للجمع في الماضي)." },
-                    { q: "Did you ________ the email?", options: ["sent", "sends", "sending", "send"], correct: 3, feed: "d) send (بعد Did يرجع الفعل لأصله 'المصدر' بدون إضافات)." },
+                    { q: "Did you ________ the email?", options: ["sent", "sends", "sending", "send"], correct: 3, feed: "d) send (بعد Did يرجع الفعل لأصله 'المصدر' بدون إجاهات)." },
                     { q: "My parents ________ a new car last month.", options: ["buy", "bought", "buyed", "buying"], correct: 1, feed: "b) bought (الماضي من buy وهو فعل غير منتظم)." },
                     { q: "Where ________ she go for her vacation?", options: ["did", "does", "was", "were"], correct: 0, feed: "a) did (أداة السؤال عن الماضي)." },
                     { q: "I ________ very tired after the long trip.", options: ["were", "am", "was", "did"], correct: 2, feed: "c) was (لأن I تأخذ was في الماضي)." },
@@ -732,7 +887,7 @@
                 {en: "Buy", ar: "يشتري", icon: "fa-cart-shopping", ex: "I buy milk every day.", exAr: "أشري حليباً كل يوم"},
                 {en: "Speak", ar: "يتحدث", icon: "fa-comments", ex: "I speak Arabic.", exAr: "أتحدث العربية"},
                 {en: "Write", ar: "يكتب", icon: "fa-pen-clip", ex: "Write your name here.", exAr: "اكتب اسمك هنا"},
-                {en: "Read", ar: "يقرأ", icon: "fa-book-open", ex: "I read a book.", exAr: "أقرأ كتاباً"},
+                {en: "Read", ar: "يقرأ", icon: "fa-book-open", ex: "I read a book.", exAr: "أريد كتاباً"},
                 {en: "Listen", ar: "يستمع", icon: "fa-ear-listen", ex: "Listen to the teacher.", exAr: "استمع للمعلم"},
                 {en: "Family", ar: "عائلة", icon: "fa-users", ex: "I love my family.", exAr: "أحب عائلتي"},
                 {en: "Friend", ar: "صديق", icon: "fa-user-group", ex: "Sarah is my friend.", exAr: "سارة صديقتي"},
@@ -862,6 +1017,7 @@
             if (event.target == document.getElementById('grammarModal')) closeGrammar();
             if (event.target == document.getElementById('testModal')) closeTest();
             if (event.target == document.getElementById('mySidebar')) closeNav();
+            if (event.target == document.getElementById('authModal')) closeAuthModal();
         }
     </script>
 </body>
