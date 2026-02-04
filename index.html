@@ -22,6 +22,58 @@
         .nav-logo img { height: 75px; width: auto; }
         .contact-top-btn { background: var(--primary-blue); color: white; padding: 8px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
 
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 3000;
+            top: 0;
+            right: 0;
+            background-color: var(--primary-blue);
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            text-align: right;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar a i { margin-left: 10px; width: 25px; text-align: center; }
+
+        .sidebar a:hover { background-color: var(--primary-red); }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            left: 25px;
+            font-size: 36px;
+            border: none;
+        }
+
+        .open-btn {
+            font-size: 22px;
+            cursor: pointer;
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         /* Hero Section */
         header { background: linear-gradient(135deg, rgba(14, 59, 125, 0.95), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; padding: 80px 20px; color: white; text-align: center; }
         .hero-banner { max-width: 600px; width: 90%; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 30px; }
@@ -37,7 +89,7 @@
         /* Test Modal Specifics */
         #testModal { direction: ltr; text-align: left; }
         .test-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; } /* Hidden Timer Bar */
+        .timer-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; }
         .timer-progress { width: 100%; height: 100%; background: var(--primary-red); transition: width 1s linear; }
         .question-card h2 { font-size: 1.4rem; color: var(--primary-blue); margin-bottom: 25px; line-height: 1.4; }
         .test-options { display: grid; gap: 12px; }
@@ -121,13 +173,26 @@
 <body>
 
     <nav>
-        <div class="nav-logo">
-            <img src="https://i.postimg.cc/7hxvdC7x/file-0000000095dc71f48b62b00798f8b2b2.png" alt="Go English Logo">
+        <div style="display: flex; align-items: center;">
+            <button class="open-btn" onclick="openNav()"><i class="fas fa-bars"></i> القائمة</button>
+            <div class="nav-logo">
+                <img src="https://i.postimg.cc/7hxvdC7x/file-0000000095dc71f48b62b00798f8b2b2.png" alt="Go English Logo">
+            </div>
         </div>
         <a href="tel:01271032448" class="contact-top-btn">
             <i class="fas fa-phone-alt"></i> اتصل بنا
         </a>
     </nav>
+
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="header" onclick="closeNav()"><i class="fas fa-house"></i> من نحن (الرئيسية)</a>
+        <a href=".grammar-section" onclick="closeNav()"><i class="fas fa-book"></i> قسم الجرامر</a>
+        <a href=".vocab-section" onclick="closeNav()"><i class="fas fa-spell-check"></i> قسم الكلمات</a>
+        <a href=".placement-cta" onclick="closeNav()"><i class="fas fa-vial"></i> قسم الاختبار</a>
+        <a href="#courses" onclick="closeNav()"><i class="fas fa-calendar-check"></i> قسم الحجز</a>
+        <a href=".footer-info" onclick="closeNav()"><i class="fas fa-phone"></i> تواصل بنا</a>
+    </div>
 
     <header>
         <div class="hero-content">
@@ -318,9 +383,90 @@
         <div class="copyright"><p>جميع الحقوق محفوظة لمركز Go English &copy; 2024</p></div>
     </section>
 
+    <script type="module">
+        // Import Firebase functions from CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDLBzMNHKlJmKnHAEqlEAIv8WQi7bHbQvM",
+          authDomain: "gooo-985e3.firebaseapp.com",
+          projectId: "gooo-985e3",
+          storageBucket: "gooo-985e3.firebasestorage.app",
+          messagingSenderId: "413140272711",
+          appId: "1:413140272711:web:3c0068fae6b293a1231362",
+          measurementId: "G-VL6S9WSXC5"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app); // Making Auth available for future login forms
+
+        console.log("Firebase initialized successfully on Go English!");
+    </script>
     <script>
+        // --- Original Website Scripts ---
+        let isTesting = false;
+
+        window.addEventListener('beforeunload', function (e) {
+            if (isTesting) {
+                e.preventDefault();
+                e.returnValue = 'هل أنت متأكد من رغبتك في مغادرة الاختبار؟ سيتم فقدان تقدمك.';
+            }
+        });
+
+        function preventBack() {
+            window.history.pushState(null, "", window.location.href);
+            window.onpopstate = function () {
+                if (isTesting) {
+                    if (confirm("هل تريد حقاً الخروج من الاختبار؟")) {
+                        isTesting = false;
+                        closeTest();
+                    } else {
+                        window.history.pushState(null, "", window.location.href);
+                    }
+                } else {
+                    window.history.back();
+                }
+            };
+        }
+
+        function openNav() {
+            document.getElementById("mySidebar").style.width = "280px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+        }
+
+        document.querySelectorAll('.sidebar a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId !== 'javascript:void(0)') {
+                    e.preventDefault();
+                    let targetElement;
+                    if(targetId.startsWith('.')) {
+                        targetElement = document.querySelector(targetId);
+                    } else if(targetId.startsWith('#')) {
+                        targetElement = document.getElementById(targetId.substring(1));
+                    } else {
+                        targetElement = document.getElementsByTagName(targetId)[0];
+                    }
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+
         const placementQuestions = [
-            // A1-A2 (30)
             {q: "Hello, what ______ your name?", o: ["is", "are", "am"], c: 0},
             {q: "I ______ from Egypt.", o: ["is", "am", "are"], c: 1},
             {q: "This is my friend. ______ name is Sarah.", o: ["Her", "His", "She"], c: 0},
@@ -351,8 +497,6 @@
             {q: "I ______ never been to France.", o: ["am", "have", "had"], c: 1},
             {q: "We ______ a new car last week.", o: ["buy", "bought", "buys"], c: 1},
             {q: "Excuse me, ______ is the supermarket?", o: ["where", "when", "who"], c: 0},
-            
-            // B1-B2 (40)
             {q: "I ______ English for five years.", o: ["study", "am studying", "have been studying"], c: 2},
             {q: "If it rains, we ______ at home.", o: ["stay", "will stay", "would stay"], c: 1},
             {q: "She told me that she ______ the movie before.", o: ["saw", "has seen", "had seen"], c: 2},
@@ -393,8 +537,6 @@
             {q: "I don't know ______ she is.", o: ["who", "which", "what"], c: 0},
             {q: "She ______ her promise.", o: ["kept", "held", "took"], c: 0},
             {q: "I'll wait here until she ______.", o: ["comes", "will come", "come"], c: 0},
-            
-            // C1 (30)
             {q: "Rarely ______ such a beautiful sunset.", o: ["I have seen", "have I seen", "saw I"], c: 1},
             {q: "It's high time you ______ a job.", o: ["find", "found", "to find"], c: 1},
             {q: "No sooner ______ left the house than it started to rain.", o: ["he had", "had he", "did he"], c: 1},
@@ -429,7 +571,6 @@
 
         let currentQ = 0;
         let score = 0;
-        // Timer variables removed/disabled for test logic
 
         function startPlacementTest() {
             document.getElementById('testModal').style.display = 'block';
@@ -438,12 +579,15 @@
 
         function resetTest() {
             currentQ = 0; score = 0;
+            isTesting = false;
             document.getElementById('testWelcome').style.display = 'block';
             document.getElementById('testArea').style.display = 'none';
             document.getElementById('testResult').style.display = 'none';
         }
 
         function runTest() {
+            isTesting = true;
+            preventBack(); 
             document.getElementById('testWelcome').style.display = 'none';
             document.getElementById('testArea').style.display = 'block';
             showQuestion();
@@ -484,6 +628,7 @@
         }
 
         function finishTest() {
+            isTesting = false;
             document.getElementById('testArea').style.display = 'none';
             document.getElementById('testResult').style.display = 'block';
             document.getElementById('finalScoreDisplay').innerText = `${score}/100`;
@@ -501,6 +646,10 @@
         }
 
         function closeTest() {
+            if (isTesting) {
+                if (!confirm("هل تريد إغلاق الاختبار؟ ستفقد نتيجتك.")) return;
+            }
+            isTesting = false;
             document.getElementById('testModal').style.display = 'none';
         }
 
@@ -533,7 +682,7 @@
             document.getElementById('grammarTitle').innerText = data.title;
             document.getElementById('grammarBody').innerHTML = data.explanation;
             const quizItems = document.getElementById('quizItems');
-            quizItems.innerHTML = ""; // Clear existing quiz
+            quizItems.innerHTML = "";
             data.questions.forEach((item, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'quiz-question';
@@ -600,7 +749,7 @@
                 {en: "Store", ar: "متجر", icon: "fa-shop", ex: "The store is closed.", exAr: "المتجر مغلق"},
                 {en: "Car", ar: "سيارة", icon: "fa-car", ex: "My car is white.", exAr: "سيارتي بيضاء"},
                 {en: "Phone", ar: "هاتف", icon: "fa-mobile-screen", ex: "Where is my phone?", exAr: "أين هاتفي؟"},
-                {en: "Day", ar: "يوم", icon: "fa-calendar-day", ex: "It is a sunny day.", exAr: "إنه يوم مشمس"},
+                {en: "Day", ar: "يوم", icon: "fa-calendar-day", ex: "It is a sunny day.", exAr: "إنه يوم مشمش"},
                 {en: "Week", ar: "أسبوع", icon: "fa-calendar-week", ex: "See you next week.", exAr: "أراك الأسبوع القادم"},
                 {en: "Month", ar: "شهر", icon: "fa-calendar-days", ex: "This month is cold.", exAr: "هذا الشهر بارد"},
                 {en: "Year", ar: "سنة", icon: "fa-calendar", ex: "Happy New Year!", exAr: "سنة جديدة سعيدة"},
@@ -706,9 +855,13 @@
         }
 
         window.onclick = function(event) {
+            if (isTesting && event.target == document.getElementById('testModal')) {
+                return; 
+            }
             if (event.target == document.getElementById('vocabModal')) closeVocab();
             if (event.target == document.getElementById('grammarModal')) closeGrammar();
             if (event.target == document.getElementById('testModal')) closeTest();
+            if (event.target == document.getElementById('mySidebar')) closeNav();
         }
     </script>
 </body>
